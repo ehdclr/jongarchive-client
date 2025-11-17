@@ -24,8 +24,9 @@ apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-
+  
     // 401 에러 && 토큰 만료
+    // retry 는 한번만 시도
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
