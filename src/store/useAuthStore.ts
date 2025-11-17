@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import apiClient from "@/lib/axios";
+import { API_ROUTES } from "@/const/api";
 
 interface User {
   id: number;
@@ -53,6 +54,9 @@ const useAuthStore = create<AuthState>()(
       },
       setTokens: (refreshToken: string) => set({ refreshToken }),
       logout: async() => {
+
+        await apiClient.post(API_ROUTES.AUTH.LOGOUT.url);
+
         set({
           user: null,
           isAuthenticated: false,
