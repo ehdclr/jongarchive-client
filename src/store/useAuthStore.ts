@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { apiClient } from "@/lib/axios";
+import apiClient from "@/lib/axios";
 
 interface User {
   id: number;

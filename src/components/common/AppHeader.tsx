@@ -1,9 +1,11 @@
 import { NavLink, useNavigate } from "react-router";
 import { Button } from "../ui/button";
 import { LogOutIcon } from "lucide-react";
+import useAuthStore from "@/store/useAuthStore";
 
 function AppHeader() {
   const navigate = useNavigate();
+  const { logout } = useAuthStore();
 
   return (
     <header className="fixed top-0 z-20 w-full flex items-center justify-center bg-[#121212]">
@@ -25,7 +27,9 @@ function AppHeader() {
       <div className="flex items-center gap-5">
         <span>
           <div className="flex items-center justify-center font-semibold">
-            Logout
+            <Button variant="ghost" size="sm" onClick={logout}>
+              Logout
+            </Button>
           </div>
         </span>
       </div>
