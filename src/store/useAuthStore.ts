@@ -54,7 +54,6 @@ const useAuthStore = create<AuthState>()(
       },
       setTokens: (refreshToken: string) => set({ refreshToken }),
       logout: async() => {
-
         await apiClient.post(API_ROUTES.AUTH.LOGOUT.url);
         set({
           user: null,
