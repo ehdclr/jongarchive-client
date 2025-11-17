@@ -1,5 +1,6 @@
 import axios from "axios";
 import { API_ROUTES } from "@/const/api";
+import { ERROR_MESSAGES } from "@/const/error";
 
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
@@ -25,12 +26,11 @@ apiClient.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
   
-    // 401 에러 && 토큰 만료
-    // retry 는 한번만 시도
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    //access token 만료 시 리프레시 토큰 사용
+    if (error.response?.status === 401 && error.response?.data?.error?.type === ERROR_MESSAGES.UNAUTHORIZED.ACCESS_TOKEN_EXPIRED.type) {
       originalRequest._retry = true;
       try {
-        await apiClient.post(API_ROUTES.AUTH.REFRESH.url);
+        const { data } = await apiClient.post(API_ROUTES.AUTH.REFRESH.url);
         return apiClient(originalRequest);
       } catch (refreshError) {
         window.location.href = "/signin";
@@ -38,6 +38,9 @@ apiClient.interceptors.response.use(
       }
     }
 
+    if (error.response?.status === 401 && error.response?.data?.error?.type === ERROR_MESSAGES.UNAUTHORIZED.REFRESH_TOKEN_EXPIRED.type) {
+      window.location.href = "/signin";
+    }
     return Promise.reject(error);
   }
 );

@@ -56,12 +56,12 @@ const useAuthStore = create<AuthState>()(
       logout: async() => {
 
         await apiClient.post(API_ROUTES.AUTH.LOGOUT.url);
-
         set({
           user: null,
           isAuthenticated: false,
           refreshToken: null,
         })
+        window.location.href = "/signin";
       },
     }),
     {
