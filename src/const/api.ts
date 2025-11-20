@@ -11,12 +11,16 @@ export const API_ROUTES = {
     LOGOUT: {
       url: '/auth/logout',
       method: 'POST',
-    }
+    },
   },
   USERS: {
     SIGNUP: {
       url: '/users',
       method: 'POST',
+    },
+    ME: {
+      url: '/users/me',
+      method: 'GET',
     },
   },
 }

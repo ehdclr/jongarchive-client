@@ -28,7 +28,6 @@ const useAuthStore = create<AuthState>()(
     (set) => ({
       user: null,
       isAuthenticated: false,
-      refreshToken: null,
       setUser: (user: User) => {
         if(!user){
           return set({
@@ -37,19 +36,19 @@ const useAuthStore = create<AuthState>()(
           })
         }
         return set({
-          user: {
-            ...user,
-            id: user?.id || 0,
-            email: user?.email || '',
-            phoneNumber: user?.phoneNumber || '',
-            name: user?.name || '',
-            profileImageUrl: user?.profileImageUrl || '',
-            provider: user?.provider || '',
-            bio: user?.bio || '',
-            createdAt: user?.createdAt || '',
-          },
+          user,
           isAuthenticated: !!user,
         })
+      },
+      fetchUser: async () => {
+        try {
+          const response = await apiClient.get(API_ROUTES.USERS.ME.url);
+          if (response.data.success && response.data.payload) {
+            set({ user: response.data.payload, isAuthenticated: true });
+          }
+        } catch (error) {
+          set({ user: null, isAuthenticated: false });
+        }
       },
       setTokens: (refreshToken: string) => set({ refreshToken }),
       logout: async() => {
@@ -67,7 +66,6 @@ const useAuthStore = create<AuthState>()(
       partialize: (state) => ({
         user: state.user,
         isAuthenticated: state.isAuthenticated,
-        refreshToken: state.refreshToken,
       }),
     }
   )
