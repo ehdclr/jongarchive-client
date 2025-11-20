@@ -1,6 +1,7 @@
 import axios from "axios";
 import { API_ROUTES } from "@/const/api";
-import { ERROR_MESSAGES } from "@/const/error";
+import { ERROR_MESSAGES, getErrorMessage } from "@/const/error";
+import { toast } from "sonner"; // ✅ 추가
 
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
@@ -9,7 +10,7 @@ const apiClient = axios.create({
 
 apiClient.interceptors.request.use(
   (config) => {
-    if (!(config.headers["Content-Type"] === "application/json")) {
+    if (!(config.headers["Content-Type"] === "multipart/form-data")) {
       config.headers["Content-Type"] = "application/json";
     } else {
       delete config.headers["Content-Type"];
@@ -25,22 +26,37 @@ apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+    const errorType = error.response?.data?.error?.type;
   
-    //access token 만료 시 리프레시 토큰 사용
-    if (error.response?.status === 401 && error.response?.data?.error?.type === ERROR_MESSAGES.UNAUTHORIZED.ACCESS_TOKEN_EXPIRED.type) {
-      originalRequest._retry = true;
-      try {
-        const { data } = await apiClient.post(API_ROUTES.AUTH.REFRESH.url);
-        return apiClient(originalRequest);
-      } catch (refreshError) {
-        window.location.href = "/signin";
-        return Promise.reject(refreshError);
+    if (
+      error.response?.status === 401 && 
+      errorType === ERROR_MESSAGES.UNAUTHORIZED.ACCESS_TOKEN_EXPIRED.type
+    ) {
+      if (!originalRequest._retry) {
+        originalRequest._retry = true;
+        try {
+          await apiClient.post(API_ROUTES.AUTH.REFRESH.url);
+          return apiClient(originalRequest);
+        } catch (refreshError) {
+          toast.error("세션 만료", {
+            description: "다시 로그인해주세요.",
+          });
+          window.location.href = "/signin";
+          return Promise.reject(refreshError);
+        }
       }
     }
 
-    if (error.response?.status === 401 && error.response?.data?.error?.type === ERROR_MESSAGES.UNAUTHORIZED.REFRESH_TOKEN_EXPIRED.type) {
+    if (
+      error.response?.status === 401 && 
+      errorType === ERROR_MESSAGES.UNAUTHORIZED.REFRESH_TOKEN_EXPIRED.type
+    ) {
+      toast.error("세션 만료", {
+        description: "다시 로그인해주세요.",
+      });
       window.location.href = "/signin";
     }
+
     return Promise.reject(error);
   }
 );

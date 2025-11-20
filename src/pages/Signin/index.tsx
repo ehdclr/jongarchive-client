@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
@@ -5,14 +6,21 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { NavLink } from "react-router";
+import { useNavigate } from "react-router";
+import { getErrorMessage } from "@/const/error";
+import { toast } from "sonner";
 import apiClient from "@/lib/axios";
+import { API_ROUTES } from "@/const/api";
 
 const formSchema = z.object({
   email: z.string().email(),
-  password: z.string().min(8).max(20),
+  password: z.string().min(8, { message: "비밀번호는 8자 이상이어야 합니다." }).max(20, { message: "비밀번호는 20자 이하이어야 합니다." }),
 });
 
 export default function Signin() {
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -21,11 +29,30 @@ export default function Signin() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsLoading(true);
+    try {
+      const response = await apiClient.post(API_ROUTES.AUTH.SIGNIN.url, values);
+
+      if (response.data.success) {
+        toast.success("로그인 성공!", {
+          description: "환영합니다!",
+        });
+        navigate("/"); // 메인 페이지로 이동
+      }
+    } catch (error) {
+      console.error("로그인 에러:", error);
+      //TODO: 에러 응답 구조에 따라 처리
+      const errorType = error.response?.data?.error?.type || "unknown_error";
+      const errorMessage = getErrorMessage(errorType) || "로그인에 실패했습니다.";
+      toast.error("로그인 실패", {
+        description: errorMessage,
+      });
+    } finally {
+      setIsLoading(false);
+    }
   }
 
-  //TODO: 소셜 로그인(구글)
   const handleGoogleLogin = () => {
     window.location.href = `${import.meta.env.VITE_API_URL}/auth/google`;
   };

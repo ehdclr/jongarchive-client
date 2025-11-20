@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import { ThemeProvider } from './components/theme-provider.tsx'
 import { BrowserRouter, Routes, Route } from 'react-router'
+import { Toaster } from './components/ui/sonner.tsx'
 
 
 import App from './App.tsx'
@@ -19,6 +20,7 @@ createRoot(document.getElementById('root')!).render(
           <Route path="/" element={<App />} />
         </Routes>
       </BrowserRouter>
+      <Toaster richColors position="top-center" />
     </ThemeProvider>
   </StrictMode>,
 )

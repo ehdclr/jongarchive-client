@@ -4,9 +4,19 @@ export const API_ROUTES = {
       url: '/auth/refresh',
       method: 'POST',
     },
+    SIGNIN: {
+      url: '/auth/signin',
+      method: 'POST',
+    },
     LOGOUT: {
       url: '/auth/logout',
       method: 'POST',
     }
-  }
+  },
+  USERS: {
+    SIGNUP: {
+      url: '/users',
+      method: 'POST',
+    },
+  },
 }
