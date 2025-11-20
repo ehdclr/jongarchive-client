@@ -36,7 +36,6 @@ const useAuthStore = create<AuthState>()(
             isAuthenticated: false,
           })
         }
-
         return set({
           user: {
             ...user,

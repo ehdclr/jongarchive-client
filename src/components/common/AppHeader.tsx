@@ -1,11 +1,12 @@
 import { NavLink, useNavigate } from "react-router";
 import { Button } from "../ui/button";
 import { LogOutIcon } from "lucide-react";
+import { Separator } from "../ui/separator";
 import useAuthStore from "@/store/useAuthStore";
 
 function AppHeader() {
   const navigate = useNavigate();
-  const { logout } = useAuthStore();
+  const { logout, user } = useAuthStore();
 
   return (
     <header className="fixed top-0 z-20 w-full flex items-center justify-center bg-[#121212]">
@@ -17,9 +18,13 @@ function AppHeader() {
           <NavLink className="font-semibold" to="/post">
             Post
           </NavLink>
-          {/* <Separator orientation="vertical" className="h-4!" /> */}
+          <Separator orientation="vertical" className="h-4!" />
           <NavLink className="font-semibold" to="/calendar">
             Calendar
+          </NavLink>
+          <Separator orientation="vertical" className="h-4!" />
+          <NavLink className="font-semibold" to="/portfolio">
+            Portfolio
           </NavLink>
         </div>
       </div>
@@ -27,9 +32,15 @@ function AppHeader() {
       <div className="flex items-center gap-5">
         <span>
           <div className="flex items-center justify-center font-semibold">
-            <Button variant="ghost" size="sm" onClick={logout}>
-              Logout
-            </Button>
+            {user? (
+              <Button variant="ghost" size="sm" onClick={logout}>
+                Logout
+              </Button>
+            ) : (
+              <Button variant="ghost" size="sm" onClick={() => navigate('/signin')}>
+                Login
+              </Button>
+            )}
           </div>
         </span>
       </div>

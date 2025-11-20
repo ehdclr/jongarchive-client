@@ -11,6 +11,7 @@ import { getErrorMessage } from "@/const/error";
 import { toast } from "sonner";
 import apiClient from "@/lib/axios";
 import { API_ROUTES } from "@/const/api";
+import useAuthStore from "@/store/useAuthStore";
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -20,6 +21,7 @@ const formSchema = z.object({
 export default function Signin() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const { setUser } = useAuthStore();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -39,10 +41,9 @@ export default function Signin() {
           description: "환영합니다!",
         });
         navigate("/"); // 메인 페이지로 이동
+        setUser(response.data.payload);
       }
     } catch (error) {
-      console.error("로그인 에러:", error);
-      //TODO: 에러 응답 구조에 따라 처리
       const errorType = error.response?.data?.error?.type || "unknown_error";
       const errorMessage = getErrorMessage(errorType) || "로그인에 실패했습니다.";
       toast.error("로그인 실패", {

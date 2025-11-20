@@ -79,6 +79,7 @@ export default function SignUp() {
       formData.append("email", values.email);
       formData.append("password", values.password);
       formData.append("name", values.name);
+      formData.append("provider", values.provider);
 
       if (values.phoneNumber) {
         formData.append("phoneNumber", values.phoneNumber);
