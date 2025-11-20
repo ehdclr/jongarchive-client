@@ -2,25 +2,17 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import { ThemeProvider } from './components/theme-provider.tsx'
-import { BrowserRouter, Routes, Route } from 'react-router'
+import { BrowserRouter } from 'react-router'
 import { Toaster } from './components/ui/sonner.tsx'
-
-
-import App from './App.tsx'
-import Signin from './pages/Signin'
-import SignUp from './pages/SignUp'
+import { AppRouter } from './router' // ✅ 라우터 import
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ThemeProvider>
       <BrowserRouter>
-        <Routes>
-          <Route path="/signin" element={<Signin />} />
-          <Route path="/signup" element={<SignUp />} />
-          <Route path="/" element={<App />} />
-        </Routes>
+        <AppRouter /> {/* ✅ 라우터 사용 */}
+        <Toaster richColors position="top-center" />
       </BrowserRouter>
-      <Toaster richColors position="top-center" />
     </ThemeProvider>
   </StrictMode>,
 )

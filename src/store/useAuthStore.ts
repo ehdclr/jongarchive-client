@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import apiClient from "@/lib/axios";
 import { API_ROUTES } from "@/const/api";
+import { ROUTES } from "@/const/routes";
 
 interface User {
   id: number;
@@ -17,9 +18,9 @@ interface User {
 interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
-  refreshToken: string | null;
-  setUser: (user: User) => void;
-  setTokens: (refreshToken: string) => void;
+  isLoading: boolean;
+  setUser: (user: User | null) => void;
+  fetchUser: () => Promise<void>;
   logout: () => void;
 }
 
@@ -28,6 +29,7 @@ const useAuthStore = create<AuthState>()(
     (set) => ({
       user: null,
       isAuthenticated: false,
+      isLoading: false,
       setUser: (user: User) => {
         if(!user){
           return set({
@@ -42,23 +44,22 @@ const useAuthStore = create<AuthState>()(
       },
       fetchUser: async () => {
         try {
+          set({ isLoading: true });
           const response = await apiClient.get(API_ROUTES.USERS.ME.url);
           if (response.data.success && response.data.payload) {
             set({ user: response.data.payload, isAuthenticated: true });
           }
         } catch (error) {
           set({ user: null, isAuthenticated: false });
+        } finally {
+          set({ isLoading: false });
         }
       },
-      setTokens: (refreshToken: string) => set({ refreshToken }),
       logout: async() => {
         await apiClient.post(API_ROUTES.AUTH.LOGOUT.url);
-        set({
-          user: null,
-          isAuthenticated: false,
-          refreshToken: null,
-        })
-        window.location.href = "/signin";
+        // set({ isLoading: false });
+        set({ user: null, isAuthenticated: false });
+        window.location.href = ROUTES.SIGNIN.path;
       },
     }),
     {
