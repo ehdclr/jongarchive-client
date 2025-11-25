@@ -21,20 +21,20 @@ export function PostCard({ data, showPublishBadge = false }: PostCardProps) {
   const { post, author } = data;
 
   return (
-    <Link to={`/posts/${post.id}`}>
-      <Card className="h-full overflow-hidden transition-shadow hover:shadow-lg">
+    <Link to={`/posts/${post.id}`} className="group block">
+      <Card className="h-full overflow-hidden border-border/50 bg-card/50 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:bg-card hover:shadow-xl hover:shadow-primary/5">
         {post.thumbnailUrl && (
           <AspectRatio ratio={16 / 9}>
             <img
               src={post.thumbnailUrl}
               alt={post.title}
-              className="h-full w-full object-cover"
+              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
           </AspectRatio>
         )}
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
-            <h3 className="line-clamp-2 text-lg font-semibold">{post.title}</h3>
+            <h3 className="line-clamp-2 text-lg font-semibold transition-colors duration-300 group-hover:text-primary">{post.title}</h3>
             {showPublishBadge && (
               <Badge variant={post.isPublished ? "default" : "secondary"}>
                 {post.isPublished ? "공개" : "비공개"}

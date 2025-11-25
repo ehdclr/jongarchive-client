@@ -2,9 +2,10 @@ import { lazy, Suspense, type ComponentType } from "react";
 import { Routes, Route, Navigate } from "react-router";
 import { ProtectedRoute, PublicRoute } from "@/components/auth";
 import { ROUTES } from "@/const/routes";
+import App from "@/App";
 
 // Pages
-const Home = lazy(() => import("@/App"));
+const Home = lazy(() => import("@/pages/Home"));
 const Signin = lazy(() => import("@/pages/Signin"));
 const SignUp = lazy(() => import("@/pages/SignUp"));
 const Posts = lazy(() => import("@/pages/Posts"));
@@ -16,16 +17,15 @@ const PostEdit = lazy(() => import("@/pages/Posts/[post_id]/edit"));
 interface RouteItem {
   path: string;
   element: ComponentType;
-  isPublic?: boolean;
 }
 
 // Public Routes (인증 불필요, 로그인 시 홈으로 리다이렉트)
 const publicRoutes: RouteItem[] = [
-  { path: ROUTES.SIGNIN.path, element: Signin, isPublic: true },
-  { path: ROUTES.SIGNUP.path, element: SignUp, isPublic: true },
+  { path: ROUTES.SIGNIN.path, element: Signin },
+  { path: ROUTES.SIGNUP.path, element: SignUp },
 ];
 
-// Protected Routes (인증 필요)
+// Protected Routes (인증 필요, 레이아웃 포함)
 const protectedRoutes: RouteItem[] = [
   { path: ROUTES.HOME.path, element: Home },
   { path: ROUTES.POSTS.path, element: Posts },
@@ -47,7 +47,7 @@ export const AppRouter = () => {
   return (
     <Suspense fallback={<LoadingFallback />}>
       <Routes>
-        {/* Public Routes */}
+        {/* Public Routes (레이아웃 없음) */}
         {publicRoutes.map(({ path, element: Element }) => (
           <Route
             key={path}
@@ -60,18 +60,18 @@ export const AppRouter = () => {
           />
         ))}
 
-        {/* Protected Routes */}
-        {protectedRoutes.map(({ path, element: Element }) => (
-          <Route
-            key={path}
-            path={path}
-            element={
-              <ProtectedRoute>
-                <Element />
-              </ProtectedRoute>
-            }
-          />
-        ))}
+        {/* Protected Routes (App 레이아웃 포함) */}
+        <Route
+          element={
+            <ProtectedRoute>
+              <App />
+            </ProtectedRoute>
+          }
+        >
+          {protectedRoutes.map(({ path, element: Element }) => (
+            <Route key={path} path={path} element={<Element />} />
+          ))}
+        </Route>
 
         {/* Fallback */}
         <Route path="*" element={<Navigate to={ROUTES.HOME.path} replace />} />
