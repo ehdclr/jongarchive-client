@@ -1,3 +1,5 @@
+import { Link } from "react-router";
+import { FileTextIcon, PlusIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PostCard } from "./PostCard";
 import { PostCardSkeleton } from "./PostCardSkeleton";
@@ -32,8 +34,20 @@ export function PostList({
 
   if (posts.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-12">
-        <p className="text-muted-foreground">게시물이 없습니다.</p>
+      <div className="flex flex-col items-center justify-center py-24">
+        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-muted">
+          <FileTextIcon className="h-10 w-10 text-muted-foreground" />
+        </div>
+        <h3 className="mt-6 text-lg font-semibold">게시물이 없습니다</h3>
+        <p className="mt-2 text-sm text-muted-foreground">
+          첫 번째 게시물을 작성해보세요!
+        </p>
+        <Button asChild className="mt-6">
+          <Link to="/posts/new">
+            <PlusIcon className="mr-2 h-4 w-4" />
+            새 글 작성
+          </Link>
+        </Button>
       </div>
     );
   }

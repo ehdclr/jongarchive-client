@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router";
 import { useCreateBlockNote } from "@blocknote/react";
 import { BlockNoteView } from "@blocknote/mantine";
@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { ThumbnailUpload } from "./ThumbnailUpload";
+import { PostPreview } from "./PostPreview";
 import { useCreatePost, useUpdatePost } from "@/hooks/usePosts";
 import { toast } from "sonner";
 import type { Post } from "@/types/post";
@@ -35,6 +36,14 @@ export function PostForm({ mode, initialData }: PostFormProps) {
       ? JSON.parse(initialData.content)
       : undefined,
   });
+
+  // 썸네일 미리보기 URL
+  const previewThumbnailUrl = useMemo(() => {
+    if (thumbnail) {
+      return URL.createObjectURL(thumbnail);
+    }
+    return thumbnailUrl || null;
+  }, [thumbnail, thumbnailUrl]);
 
   // 임시저장 불러오기
   useEffect(() => {
@@ -108,61 +117,75 @@ export function PostForm({ mode, initialData }: PostFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="space-y-2">
-        <Label htmlFor="title">제목</Label>
-        <Input
-          id="title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="제목을 입력하세요"
-          maxLength={255}
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label>썸네일</Label>
-        <ThumbnailUpload
-          value={thumbnail ?? thumbnailUrl}
-          onChange={setThumbnail}
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label>내용</Label>
-        <div className="min-h-[400px] rounded-lg border">
-          <BlockNoteView editor={editor} theme="dark" />
-        </div>
-      </div>
-
-      {mode === "edit" && (
-        <div className="flex items-center gap-2">
-          <Switch
-            id="isPublished"
-            checked={isPublished}
-            onCheckedChange={setIsPublished}
+    <div className="flex gap-8">
+      {/* 메인 폼 영역 */}
+      <form onSubmit={handleSubmit} className="flex-1 space-y-6">
+        <div className="space-y-2">
+          <Label htmlFor="title">제목</Label>
+          <Input
+            id="title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="제목을 입력하세요"
+            maxLength={255}
           />
-          <Label htmlFor="isPublished">공개</Label>
         </div>
-      )}
 
-      <div className="flex items-center justify-end gap-4">
-        {mode === "create" && (
-          <Button type="button" variant="outline" onClick={saveDraft}>
-            임시저장
-          </Button>
+        <div className="space-y-2">
+          <Label>썸네일</Label>
+          <ThumbnailUpload
+            value={thumbnail ?? thumbnailUrl}
+            onChange={setThumbnail}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label>내용</Label>
+          <div className="min-h-[400px] rounded-lg border">
+            <BlockNoteView editor={editor} theme="dark" />
+          </div>
+        </div>
+
+        {mode === "edit" && (
+          <div className="flex items-center gap-2">
+            <Switch
+              id="isPublished"
+              checked={isPublished}
+              onCheckedChange={setIsPublished}
+            />
+            <Label htmlFor="isPublished">공개</Label>
+          </div>
         )}
-        <Button type="button" variant="ghost" onClick={() => navigate(-1)}>
-          취소
-        </Button>
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting
-            ? "저장 중..."
-            : mode === "create"
-            ? "작성하기"
-            : "수정하기"}
-        </Button>
-      </div>
-    </form>
+
+        <div className="flex items-center justify-end gap-4">
+          {mode === "create" && (
+            <Button type="button" variant="outline" onClick={saveDraft}>
+              임시저장
+            </Button>
+          )}
+          <Button type="button" variant="ghost" onClick={() => navigate(-1)}>
+            취소
+          </Button>
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting
+              ? "저장 중..."
+              : mode === "create"
+              ? "작성하기"
+              : "수정하기"}
+          </Button>
+        </div>
+      </form>
+
+      {/* 사이드바 - 미리보기 (sticky) */}
+      <aside className="hidden w-80 shrink-0 lg:block">
+        <div className="sticky top-20">
+          <PostPreview
+            title={title}
+            thumbnailUrl={previewThumbnailUrl}
+            isPublished={isPublished}
+          />
+        </div>
+      </aside>
+    </div>
   );
 }

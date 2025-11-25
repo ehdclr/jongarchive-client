@@ -71,23 +71,26 @@ export function ThumbnailUpload({ value, onChange }: ThumbnailUploadProps) {
 
   if (preview) {
     return (
-      <div className="relative">
+      <div className="group relative">
         <AspectRatio ratio={16 / 9}>
           <img
             src={preview}
             alt="썸네일 미리보기"
-            className="h-full w-full rounded-lg object-cover"
+            className="h-full w-full rounded-lg object-cover transition-opacity group-hover:opacity-75"
           />
         </AspectRatio>
-        <Button
-          type="button"
-          variant="destructive"
-          size="icon"
-          className="absolute right-2 top-2"
-          onClick={handleRemove}
-        >
-          <XIcon className="h-4 w-4" />
-        </Button>
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity group-hover:opacity-100">
+          <Button
+            type="button"
+            variant="destructive"
+            size="sm"
+            className="gap-2"
+            onClick={handleRemove}
+          >
+            <XIcon className="h-4 w-4" />
+            이미지 삭제
+          </Button>
+        </div>
       </div>
     );
   }
