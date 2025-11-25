@@ -1,8 +1,18 @@
 import { NavLink, useNavigate } from "react-router";
 import { Button } from "../ui/button";
-import { LogOutIcon } from "lucide-react";
+import { LogOutIcon, UserIcon, SettingsIcon } from "lucide-react";
 import { Separator } from "../ui/separator";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 import useAuthStore from "@/store/useAuthStore";
+import { ROUTES } from "@/const/routes";
 
 function AppHeader() {
   const navigate = useNavigate();
@@ -29,20 +39,45 @@ function AppHeader() {
           </div>
         </div>
         {/* 오른쪽 버튼 영역 */}
-        <div className="flex items-center gap-5">
-          <span>
-            <div className="flex items-center justify-center font-semibold">
-              {user ? (
-                <Button variant="ghost" size="sm" onClick={logout}>
-                  Logout
+        <div className="flex items-center gap-3">
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="relative h-9 w-9 rounded-full">
+                  <Avatar className="h-9 w-9">
+                    <AvatarImage src={user.profileImageUrl ?? undefined} alt={user.name} />
+                    <AvatarFallback>{user.name?.charAt(0) ?? "U"}</AvatarFallback>
+                  </Avatar>
                 </Button>
-              ) : (
-                <Button variant="ghost" size="sm" onClick={() => navigate("/signin")}>
-                  Login
-                </Button>
-              )}
-            </div>
-          </span>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="end" forceMount>
+                <DropdownMenuLabel className="font-normal">
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium leading-none">{user.name}</p>
+                    <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => navigate(ROUTES.PROFILE.path)}>
+                  <UserIcon className="mr-2 h-4 w-4" />
+                  내 정보
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate(ROUTES.SETTINGS.path)}>
+                  <SettingsIcon className="mr-2 h-4 w-4" />
+                  설정
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={logout} className="text-destructive focus:text-destructive">
+                  <LogOutIcon className="mr-2 h-4 w-4" />
+                  로그아웃
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Button variant="ghost" size="sm" onClick={() => navigate("/signin")}>
+              Login
+            </Button>
+          )}
         </div>
       </div>
     </header>

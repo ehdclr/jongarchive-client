@@ -22,6 +22,14 @@ export const API_ROUTES = {
       url: '/users/me',
       method: 'GET',
     },
+    UPDATE_ME: {
+      url: '/users/me',
+      method: 'PUT',
+    },
+    UPDATE_PROFILE_IMAGE: {
+      url: '/users/me/profile-image',
+      method: 'PUT',
+    },
   },
   POSTS: {
     LIST: {

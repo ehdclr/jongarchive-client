@@ -12,6 +12,7 @@ const Posts = lazy(() => import("@/pages/Posts"));
 const PostNew = lazy(() => import("@/pages/Posts/new"));
 const PostDetail = lazy(() => import("@/pages/Posts/[post_id]"));
 const PostEdit = lazy(() => import("@/pages/Posts/[post_id]/edit"));
+const Profile = lazy(() => import("@/pages/Profile"));
 
 // Route 설정 타입
 interface RouteItem {
@@ -32,6 +33,7 @@ const protectedRoutes: RouteItem[] = [
   { path: ROUTES.POST_NEW.path, element: PostNew },
   { path: ROUTES.POST_DETAIL.path, element: PostDetail },
   { path: ROUTES.POST_EDIT.path, element: PostEdit },
+  { path: ROUTES.PROFILE.path, element: Profile },
 ];
 
 const LoadingFallback = () => (
