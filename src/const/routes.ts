@@ -4,63 +4,60 @@
 export interface RouteConfig {
   path: string;
   title: string;
-  requireAuth: boolean; // 인증 필요 여부
-  redirectIfAuth?: string; // 인증되어 있을 때 리다이렉트할 경로
-  redirectIfNotAuth?: string; // 인증되지 않았을 때 리다이렉트할 경로
+  requireAuth: boolean;
 }
 
 /**
  * 애플리케이션 라우트 설정
  */
 export const ROUTES = {
-  // Public Routes (인증 불필요)
+  // Public Routes
   SIGNIN: {
     path: '/signin',
     title: '로그인',
     requireAuth: false,
-    redirectIfAuth: '/', // 이미 로그인되어 있으면 메인으로
   },
   SIGNUP: {
     path: '/signup',
     title: '회원가입',
     requireAuth: false,
-    redirectIfAuth: '/', // 이미 로그인되어 있으면 메인으로
   },
+
+  // Protected Routes
   HOME: {
     path: '/',
     title: '홈',
     requireAuth: true,
-    redirectIfNotAuth: '/signin',
   },
   POSTS: {
     path: '/posts',
-    title: '포스트 목록',
+    title: '게시물 목록',
     requireAuth: true,
-    redirectIfNotAuth: '/signin',
+  },
+  POST_NEW: {
+    path: '/posts/new',
+    title: '게시물 작성',
+    requireAuth: true,
   },
   POST_DETAIL: {
-    path: '/posts/:id',
-    title: '포스트 상세',
+    path: '/posts/:post_id',
+    title: '게시물 상세',
     requireAuth: true,
-    redirectIfNotAuth: '/signin',
   },
-  POST_CREATE: {
-    path: '/posts/:id/create',
-    title: '포스트 작성',
+  POST_EDIT: {
+    path: '/posts/:post_id/edit',
+    title: '게시물 수정',
     requireAuth: true,
-    redirectIfNotAuth: '/signin',
   },
   PROFILE: {
     path: '/profile',
     title: '프로필',
     requireAuth: true,
-    redirectIfNotAuth: '/signin',
   },
   SETTINGS: {
     path: '/settings',
     title: '설정',
     requireAuth: true,
-    redirectIfNotAuth: '/signin',
   },
 } as const;
 
@@ -78,8 +75,9 @@ export const PUBLIC_PATHS = [
 export const PROTECTED_PATHS = [
   ROUTES.HOME.path,
   ROUTES.POSTS.path,
+  ROUTES.POST_NEW.path,
   ROUTES.POST_DETAIL.path,
-  ROUTES.POST_CREATE.path,
+  ROUTES.POST_EDIT.path,
   ROUTES.PROFILE.path,
   ROUTES.SETTINGS.path,
 ];

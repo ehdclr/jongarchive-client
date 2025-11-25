@@ -17,13 +17,13 @@ export const ProtectedRoute = ({
   redirectTo = ROUTES.SIGNIN.path 
 }: ProtectedRouteProps) => {
   const location = useLocation();
-  const { isAuthenticated, fetchUser, isLoading } = useAuthStore();
+  const { isAuthenticated, fetchUser, isLoading, isLoggingOut } = useAuthStore();
 
   useEffect(() => {
-    if (!isAuthenticated && !isLoading) {
+    if (!isAuthenticated && !isLoading && !isLoggingOut) {
       fetchUser();
     }
-  }, [isAuthenticated, isLoading, fetchUser]);
+  }, [isAuthenticated, isLoading, isLoggingOut, fetchUser]);
 
   if (isLoading) {
     return (

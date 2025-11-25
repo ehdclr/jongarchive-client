@@ -19,6 +19,7 @@ interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  isLoggingOut: boolean;
   setUser: (user: User | null) => void;
   fetchUser: () => Promise<void>;
   logout: () => void;
@@ -30,6 +31,7 @@ const useAuthStore = create<AuthState>()(
       user: null,
       isAuthenticated: false,
       isLoading: false,
+      isLoggingOut: false,
       setUser: (user: User) => {
         if(!user){
           return set({
@@ -56,8 +58,8 @@ const useAuthStore = create<AuthState>()(
         }
       },
       logout: async() => {
+        set({ isLoggingOut: true });
         await apiClient.post(API_ROUTES.AUTH.LOGOUT.url);
-        // set({ isLoading: false });
         set({ user: null, isAuthenticated: false });
         window.location.href = ROUTES.SIGNIN.path;
       },

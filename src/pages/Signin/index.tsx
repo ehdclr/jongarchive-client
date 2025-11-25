@@ -44,7 +44,6 @@ export default function Signin() {
         setUser(response.data.payload);
       }
     } catch (error) {
-        
       const errorType = error.response?.data?.error?.type || "unknown_error";
       const errorMessage = getErrorMessage(errorType) || "로그인에 실패했습니다.";
       toast.error("로그인 실패", {
@@ -90,7 +89,7 @@ export default function Signin() {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input placeholder="이메을 입력해주세요" {...field} />
+                      <Input placeholder="이메일을 입력해주세요" {...field} />
                     </FormControl>
                     <FormMessage className="text-sm" />
                   </FormItem>
