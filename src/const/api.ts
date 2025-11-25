@@ -1,4 +1,14 @@
 export const API_ROUTES = {
+  CATEGORIES: {
+    LIST: {
+      url: '/categories',
+      method: 'GET',
+    },
+    DETAIL: (id: number) => ({
+      url: `/categories/${id}`,
+      method: 'GET',
+    }),
+  },
   AUTH: {
     REFRESH: {
       url: '/auth/refresh',
@@ -46,6 +56,10 @@ export const API_ROUTES = {
     },
     BY_AUTHOR: (authorId: number) => ({
       url: `/posts/author/${authorId}`,
+      method: 'GET',
+    }),
+    BY_CATEGORY: (categoryId: number) => ({
+      url: `/posts/category/${categoryId}`,
       method: 'GET',
     }),
     CREATE: {

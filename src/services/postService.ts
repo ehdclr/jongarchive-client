@@ -62,12 +62,30 @@ export async function fetchPostsByAuthor(
   return response.data;
 }
 
+export async function fetchPostsByCategory(
+  categoryId: number,
+  params: PaginationParams = {}
+): Promise<PaginatedResponse<PostWithAuthor>> {
+  const searchParams = new URLSearchParams();
+  if (params.page) searchParams.set("page", String(params.page));
+  if (params.limit) searchParams.set("limit", String(params.limit));
+
+  const baseUrl = API_ROUTES.POSTS.BY_CATEGORY(categoryId).url;
+  const url = searchParams.toString() ? `${baseUrl}?${searchParams}` : baseUrl;
+
+  const response = await apiClient.get(url);
+  return response.data;
+}
+
 export async function createPost(
   data: CreatePostRequest
 ): Promise<SingleResponse<Post>> {
   const formData = new FormData();
   formData.append("title", data.title);
   formData.append("content", data.content);
+  if (data.categoryId) {
+    formData.append("categoryId", String(data.categoryId));
+  }
   if (data.thumbnail) {
     formData.append("thumbnail", data.thumbnail);
   }
@@ -85,6 +103,8 @@ export async function updatePost(
   const formData = new FormData();
   if (data.title !== undefined) formData.append("title", data.title);
   if (data.content !== undefined) formData.append("content", data.content);
+  if (data.categoryId !== undefined)
+    formData.append("categoryId", String(data.categoryId));
   if (data.isPublished !== undefined)
     formData.append("isPublished", String(data.isPublished));
   if (data.thumbnail) formData.append("thumbnail", data.thumbnail);

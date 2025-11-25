@@ -1,9 +1,20 @@
+export interface Category {
+  id: number;
+  name: string;
+  slug: string;
+  description: string;
+  color: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Post {
   id: number;
   title: string;
   content: string;
   thumbnailUrl: string;
   authorId: number;
+  categoryId: number | null;
   isPublished: boolean;
   createdAt: string;
   updatedAt: string;
@@ -38,12 +49,14 @@ export interface SingleResponse<T> {
 export interface CreatePostRequest {
   title: string;
   content: string;
+  categoryId?: number;
   thumbnail?: File;
 }
 
 export interface UpdatePostRequest {
   title?: string;
   content?: string;
+  categoryId?: number;
   isPublished?: boolean;
   thumbnail?: File;
 }

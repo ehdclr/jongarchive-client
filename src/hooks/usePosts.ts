@@ -8,6 +8,7 @@ import {
   fetchPosts,
   fetchPost,
   fetchMyPosts,
+  fetchPostsByCategory,
   createPost,
   updatePost,
   deletePost,
@@ -58,6 +59,32 @@ export function useMyPosts(params: PaginationParams = {}) {
   return useQuery({
     queryKey: postKeys.myPosts(),
     queryFn: () => fetchMyPosts(params),
+  });
+}
+
+export function usePostsByCategory(
+  categoryId: number | null,
+  params: PaginationParams = {}
+) {
+  return useQuery({
+    queryKey: [...postKeys.lists(), "category", categoryId, params],
+    queryFn: () => fetchPostsByCategory(categoryId!, params),
+    enabled: !!categoryId,
+  });
+}
+
+export function usePostsByCategoryInfinite(
+  categoryId: number | null,
+  limit = 10
+) {
+  return useInfiniteQuery({
+    queryKey: [...postKeys.lists(), "category", categoryId],
+    queryFn: ({ pageParam = 1 }) =>
+      fetchPostsByCategory(categoryId!, { page: pageParam, limit }),
+    getNextPageParam: (lastPage) =>
+      lastPage.meta.hasMore ? lastPage.meta.page + 1 : undefined,
+    initialPageParam: 1,
+    enabled: !!categoryId,
   });
 }
 
