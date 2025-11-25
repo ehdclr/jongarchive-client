@@ -20,5 +20,11 @@ export default defineConfig({
   },
   server: {
     host: true, // 0.0.0.0으로 바인딩하여 외부 접속 허용
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+      },
+    },
   },
 })
