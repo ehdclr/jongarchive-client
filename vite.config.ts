@@ -18,4 +18,7 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  server: {
+    host: true, // 0.0.0.0으로 바인딩하여 외부 접속 허용
+  },
 })
