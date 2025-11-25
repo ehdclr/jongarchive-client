@@ -23,6 +23,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { BlockNoteViewer } from "@/components/posts";
 import { usePost, useDeletePost } from "@/hooks/usePosts";
 import useAuthStore from "@/store/useAuthStore";
 import { toast } from "sonner";
@@ -156,7 +157,7 @@ export default function PostDetailPage() {
       </div>
 
       <div className="prose prose-neutral dark:prose-invert max-w-none">
-        <div dangerouslySetInnerHTML={{ __html: post.content }} />
+        <BlockNoteViewer content={post.content} />
       </div>
     </div>
   );
