@@ -2,10 +2,10 @@ import { NavLink, useNavigate } from "react-router";
 import { Button } from "../ui/button";
 import { LogOutIcon, UserIcon, SettingsIcon } from "lucide-react";
 import { Separator } from "../ui/separator";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import useAuthStore from "@/store/useAuthStore";
 import { ROUTES } from "@/const/routes";
+import { UserAvatar } from "./UserAvatar";
 
 function AppHeader() {
   const navigate = useNavigate();
@@ -40,10 +40,12 @@ function AppHeader() {
                   variant="ghost"
                   className="relative h-10 w-10 rounded-full ring-2 ring-transparent transition-all duration-200 hover:ring-primary/50 hover:scale-105 hover:cursor-pointer focus-visible:ring-primary"
                 >
-                  <Avatar className="h-9 w-9 transition-transform duration-200">
-                    <AvatarImage src={user.profileImageUrl ?? undefined} alt={user.name} />
-                    <AvatarFallback>{user.name?.charAt(0) ?? "U"}</AvatarFallback>
-                  </Avatar>
+                  <UserAvatar
+                    src={user.profileImageUrl}
+                    name={user.name}
+                    userCode={user.userCode}
+                    className="transition-transform duration-200"
+                  />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end" forceMount>

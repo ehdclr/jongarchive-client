@@ -7,6 +7,7 @@ import { ROUTES } from "@/const/routes";
 interface User {
   id: number;
   email: string;
+  userCode: string;
   phoneNumber: string;
   name: string;
   profileImageUrl: string;
@@ -32,7 +33,7 @@ const useAuthStore = create<AuthState>()(
       isAuthenticated: false,
       isLoading: false,
       isLoggingOut: false,
-      setUser: (user: User) => {
+      setUser: (user: User | null) => {
         if(!user){
           return set({
             user: null,

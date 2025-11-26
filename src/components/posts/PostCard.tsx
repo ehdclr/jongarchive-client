@@ -8,7 +8,7 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { UserAvatar } from "@/components/common/UserAvatar";
 import { Badge } from "@/components/ui/badge";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import type { PostWithAuthor } from "@/types/post";
@@ -97,10 +97,13 @@ export function PostCard({ data, showPublishBadge = false }: PostCardProps) {
         </CardContent>
         <CardFooter className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Avatar className="h-6 w-6">
-              <AvatarImage src={author.profileImageUrl ?? undefined} />
-              <AvatarFallback>{author.name.charAt(0)}</AvatarFallback>
-            </Avatar>
+            <UserAvatar
+              src={author.profileImageUrl}
+              name={author.name}
+              userCode={author.userCode}
+              className="h-6 w-6"
+              fallbackClassName="text-sm"
+            />
             <span className="text-sm text-muted-foreground">{author.name}</span>
           </div>
           <span className="text-xs text-muted-foreground">

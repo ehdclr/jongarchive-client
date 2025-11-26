@@ -24,6 +24,7 @@ export interface Author {
   id: number;
   name: string;
   profileImageUrl: string | null;
+  userCode: string;
 }
 
 export interface PostWithAuthor {

@@ -6,31 +6,31 @@ import { Copy, Check, LayoutGridIcon, HomeIcon, UserIcon, ChevronDownIcon } from
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { useCategories } from "@/hooks/useCategories";
+import useAuthStore from "@/store/useAuthStore";
+import { getAnimalEmoji } from "./UserAvatar";
 
 function AppSidebar() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user } = useAuthStore();
   const { data: categoriesData, isLoading } = useCategories();
   const categories = categoriesData?.payload ?? [];
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
   const [copied, setCopied] = useState(false);
   const [isCategoryOpen, setIsCategoryOpen] = useState(true);
 
-  const currentUser = {
-    name: "익명 늑대",
-    userCode: "WOLF001K7J",
-    avatar: "🐺",
-  };
+  const userAvatar = getAnimalEmoji(user?.userCode);
 
   const handleCopyUserCode = async () => {
+    if (!user?.userCode) return;
     try {
-      await navigator.clipboard.writeText(currentUser.userCode);
+      await navigator.clipboard.writeText(user.userCode);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
       //TODO: 나중에 수정(배포시) HTTPS가 아닌 환경에서 fallback
       const textArea = document.createElement("textarea");
-      textArea.value = currentUser.userCode;
+      textArea.value = user.userCode;
       textArea.style.position = "fixed";
       textArea.style.opacity = "0";
       document.body.appendChild(textArea);
@@ -132,20 +132,22 @@ function AppSidebar() {
       </ScrollArea>
 
       {/* 유저 정보 */}
-      <div className="p-6 border-t border-border">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-xl">{currentUser.avatar}</div>
-          <div className="flex-1">
-            <p className="font-semibold text-foreground text-sm">{currentUser.name}</p>
-            <div className="flex items-center gap-2 mt-0.5">
-              <p className="text-xs text-muted-foreground">{currentUser.userCode}</p>
-              <button onClick={handleCopyUserCode} className="text-muted-foreground hover:text-foreground transition-colors">
-                {copied ? <Check size={12} className="text-green-500" /> : <Copy size={12} />}
-              </button>
+      {user && (
+        <div className="p-6 border-t border-border">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-xl">{userAvatar}</div>
+            <div className="flex-1">
+              <p className="font-semibold text-foreground text-sm">{user.name}</p>
+              <div className="flex items-center gap-2 mt-0.5">
+                <p className="text-xs text-muted-foreground">{user.userCode}</p>
+                <button onClick={handleCopyUserCode} className="text-muted-foreground hover:text-foreground transition-colors">
+                  {copied ? <Check size={12} className="text-green-500" /> : <Copy size={12} />}
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Footer - Posts 페이지에서만 표시 */}
       {isPostsPage && (
