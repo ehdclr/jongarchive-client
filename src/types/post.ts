@@ -52,6 +52,7 @@ export interface CreatePostRequest {
   content: string;
   categoryId?: number;
   thumbnail?: File;
+  isPublished?: boolean;
 }
 
 export interface UpdatePostRequest {

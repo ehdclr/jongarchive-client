@@ -89,6 +89,9 @@ export async function createPost(
   if (data.thumbnail) {
     formData.append("thumbnail", data.thumbnail);
   }
+  if (data.isPublished !== undefined) {
+    formData.append("isPublished", String(data.isPublished));
+  }
 
   const response = await apiClient.post(API_ROUTES.POSTS.CREATE.url, formData, {
     headers: { "Content-Type": "multipart/form-data" },

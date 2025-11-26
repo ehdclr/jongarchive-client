@@ -1,17 +1,11 @@
 import { useParams, useNavigate, Link } from "react-router";
 import { formatDistanceToNow } from "date-fns";
 import { ko } from "date-fns/locale";
-import { MoreHorizontalIcon, EditIcon, TrashIcon } from "lucide-react";
+import { EditIcon, TrashIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -112,50 +106,43 @@ export default function PostDetailPage() {
         </div>
 
         {isAuthor && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <MoreHorizontalIcon className="h-5 w-5" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem asChild>
-                <Link to={`/posts/${post.id}/edit`}>
-                  <EditIcon className="mr-2 h-4 w-4" />
-                  수정
-                </Link>
-              </DropdownMenuItem>
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <DropdownMenuItem
-                    onSelect={(e) => e.preventDefault()}
-                    className="text-destructive"
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate(`/posts/${post.id}/edit`)}
+              className="gap-1.5"
+            >
+              <EditIcon className="h-4 w-4" />
+              수정
+            </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="outline" size="sm" className="gap-1.5 text-destructive border-destructive/50 hover:bg-destructive hover:text-destructive-foreground">
+                  <TrashIcon className="h-4 w-4" />
+                  삭제
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>게시물 삭제</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    정말로 이 게시물을 삭제하시겠습니까? 이 작업은 되돌릴 수
+                    없습니다.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>취소</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={handleDelete}
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                   >
-                    <TrashIcon className="mr-2 h-4 w-4" />
                     삭제
-                  </DropdownMenuItem>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>게시물 삭제</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      정말로 이 게시물을 삭제하시겠습니까? 이 작업은 되돌릴 수
-                      없습니다.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>취소</AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={handleDelete}
-                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                    >
-                      삭제
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </DropdownMenuContent>
-          </DropdownMenu>
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
         )}
       </div>
 

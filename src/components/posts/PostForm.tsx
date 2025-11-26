@@ -163,6 +163,7 @@ export function PostForm({ mode, initialData }: PostFormProps) {
           content,
           categoryId: categoryId ?? undefined,
           thumbnail: thumbnail ?? undefined,
+          isPublished,
         });
         toast.success("게시물이 작성되었습니다.");
         navigate("/posts");
@@ -228,12 +229,17 @@ export function PostForm({ mode, initialData }: PostFormProps) {
           </div>
         </div>
 
-        {mode === "edit" && (
-          <div className="flex items-center gap-2">
-            <Switch id="isPublished" checked={isPublished} onCheckedChange={setIsPublished} />
-            <Label htmlFor="isPublished">공개</Label>
+        <div className="flex items-center gap-3 p-4 rounded-lg border bg-muted/30">
+          <Switch id="isPublished" checked={isPublished} onCheckedChange={setIsPublished} />
+          <div className="flex-1">
+            <Label htmlFor="isPublished" className="text-sm font-medium cursor-pointer">
+              {isPublished ? "공개" : "비공개"}
+            </Label>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {isPublished ? "모든 사용자가 이 게시물을 볼 수 있습니다." : "나만 이 게시물을 볼 수 있습니다."}
+            </p>
           </div>
-        )}
+        </div>
 
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">

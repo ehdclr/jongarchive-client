@@ -110,16 +110,16 @@
   --sidebar-ring: oklch(0.556 0 0);
 
   /* ========== 커스텀 색상 (자유롭게 수정) ========== */
-  --brand-lime: #4ade80;           /* 라임 그린 */
-  --brand-lime-dark: #22c55e;      /* 라임 그린 (어두운) */
-  --brand-yellow: #fef08a;         /* 노란색 */
-  --brand-orange: #fb923c;         /* 오렌지 */
-  --brand-pink: #f472b6;           /* 핑크 */
-  --brand-purple: #a78bfa;         /* 퍼플 */
-  --brand-cyan: #22d3ee;           /* 시안 */
-  --brand-dark-bg: #0a0a0a;        /* 진한 배경 */
-  --brand-dark-card: #1a1a1a;      /* 카드 배경 */
-  --brand-dark-border: #262626;    /* 테두리 */
+  --brand-lime: #4ade80; /* 라임 그린 */
+  --brand-lime-dark: #22c55e; /* 라임 그린 (어두운) */
+  --brand-yellow: #fef08a; /* 노란색 */
+  --brand-orange: #fb923c; /* 오렌지 */
+  --brand-pink: #f472b6; /* 핑크 */
+  --brand-purple: #a78bfa; /* 퍼플 */
+  --brand-cyan: #22d3ee; /* 시안 */
+  --brand-dark-bg: #0a0a0a; /* 진한 배경 */
+  --brand-dark-card: #1a1a1a; /* 카드 배경 */
+  --brand-dark-border: #262626; /* 테두리 */
 }
 
 @layer base {
