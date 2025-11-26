@@ -27,9 +27,17 @@ export interface Author {
   userCode: string;
 }
 
+export interface CategoryInfo {
+  id: number;
+  name: string;
+  slug: string;
+  color: string | null;
+}
+
 export interface PostWithAuthor {
   post: Post;
   author: Author;
+  category: CategoryInfo | null;
 }
 
 export interface PaginatedResponse<T> {

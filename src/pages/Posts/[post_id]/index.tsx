@@ -67,7 +67,7 @@ export default function PostDetailPage() {
     );
   }
 
-  const { post, author } = postData;
+  const { post, author, category } = postData;
 
   return (
     <div className="container mx-auto max-w-4xl px-4 py-8">
@@ -81,9 +81,20 @@ export default function PostDetailPage() {
 
       <div className="mb-6 flex items-start justify-between">
         <div>
-          <div className="mb-2 flex items-center gap-2">
+          <div className="mb-2 flex flex-wrap items-center gap-2">
             <h1 className="text-3xl font-bold">{post.title}</h1>
             {!post.isPublished && <Badge variant="secondary">비공개</Badge>}
+            {category && (
+              <Badge
+                variant="outline"
+                style={{
+                  borderColor: category.color ?? undefined,
+                  color: category.color ?? undefined,
+                }}
+              >
+                {category.name}
+              </Badge>
+            )}
           </div>
           <div className="flex items-center gap-4 text-muted-foreground">
             <Link
