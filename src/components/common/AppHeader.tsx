@@ -43,7 +43,9 @@ function AppHeader() {
                   <UserAvatar
                     src={user.profileImageUrl}
                     name={user.name}
+                    userId={user.id}
                     userCode={user.userCode}
+                    role={user.role}
                     className="transition-transform duration-200"
                   />
                 </Button>

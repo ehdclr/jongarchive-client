@@ -12,6 +12,7 @@ interface User {
   name: string;
   profileImageUrl: string;
   provider: string;
+  role: "admin" | "moderator" | "user";
   bio: string;
   createdAt: string;
 }

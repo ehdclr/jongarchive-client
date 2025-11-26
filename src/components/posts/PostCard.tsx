@@ -100,6 +100,7 @@ export function PostCard({ data, showPublishBadge = false }: PostCardProps) {
             <UserAvatar
               src={author.profileImageUrl}
               name={author.name}
+              userId={author.id}
               userCode={author.userCode}
               className="h-6 w-6"
               fallbackClassName="text-sm"

@@ -19,7 +19,7 @@ function AppSidebar() {
   const [copied, setCopied] = useState(false);
   const [isCategoryOpen, setIsCategoryOpen] = useState(true);
 
-  const userAvatar = getAnimalEmoji(user?.userCode);
+  const userAvatar = getAnimalEmoji(user?.id, user?.userCode, user?.role);
 
   const handleCopyUserCode = async () => {
     if (!user?.userCode) return;
@@ -138,12 +138,14 @@ function AppSidebar() {
             <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-xl">{userAvatar}</div>
             <div className="flex-1">
               <p className="font-semibold text-foreground text-sm">{user.name}</p>
-              <div className="flex items-center gap-2 mt-0.5">
-                <p className="text-xs text-muted-foreground">{user.userCode}</p>
-                <button onClick={handleCopyUserCode} className="text-muted-foreground hover:text-foreground transition-colors">
-                  {copied ? <Check size={12} className="text-green-500" /> : <Copy size={12} />}
-                </button>
-              </div>
+              {user.userCode && (
+                <div className="flex items-center gap-2 mt-0.5">
+                  <p className="text-xs text-muted-foreground">{user.userCode}</p>
+                  <button onClick={handleCopyUserCode} className="text-muted-foreground hover:text-foreground transition-colors">
+                    {copied ? <Check size={12} className="text-green-500" /> : <Copy size={12} />}
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>

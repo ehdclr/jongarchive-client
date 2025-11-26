@@ -3,35 +3,49 @@ import { cn } from "@/lib/utils";
 
 // 동물 이모지 배열 (개, 돼지, 말, 소)
 const ANIMAL_EMOJIS = ["🐶", "🐷", "🐴", "🐮"] as const;
+const ADMIN_EMOJI = "👑";
+
+type UserRole = "admin" | "moderator" | "user";
 
 interface UserAvatarProps {
   src?: string | null;
   name?: string;
+  userId?: number;
   userCode?: string;
+  role?: UserRole;
   className?: string;
   fallbackClassName?: string;
 }
 
 /**
- * userCode를 기반으로 일관된 동물 이모지를 반환
+ * userId 또는 userCode를 기반으로 일관된 동물 이모지를 반환
+ * admin은 항상 왕관 이모지
  */
-function getAnimalEmoji(userCode?: string): string {
-  if (!userCode) {
-    return ANIMAL_EMOJIS[Math.floor(Math.random() * ANIMAL_EMOJIS.length)];
+function getAnimalEmoji(userId?: number, userCode?: string, role?: UserRole): string {
+  if (role === "admin") {
+    return ADMIN_EMOJI;
   }
-  // userCode의 문자들의 charCode 합을 이용해 인덱스 결정
-  const hash = userCode.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  return ANIMAL_EMOJIS[hash % ANIMAL_EMOJIS.length];
+  // userId가 있으면 userId로 결정 (항상 존재하고 불변)
+  if (userId) {
+    return ANIMAL_EMOJIS[userId % ANIMAL_EMOJIS.length];
+  }
+  // userCode가 있으면 userCode로 결정
+  if (userCode) {
+    const hash = userCode.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    return ANIMAL_EMOJIS[hash % ANIMAL_EMOJIS.length];
+  }
+  // 둘 다 없으면 기본값
+  return ANIMAL_EMOJIS[0];
 }
 
-function UserAvatar({ src, name, userCode, className, fallbackClassName }: UserAvatarProps) {
-  const animalEmoji = getAnimalEmoji(userCode);
+function UserAvatar({ src, name, userId, userCode, role, className, fallbackClassName }: UserAvatarProps) {
+  const emoji = getAnimalEmoji(userId, userCode, role);
 
   return (
     <Avatar className={cn("h-9 w-9", className)}>
       {src && <AvatarImage src={src} alt={name ?? "User"} />}
       <AvatarFallback className={cn("text-lg", fallbackClassName)}>
-        {animalEmoji}
+        {emoji}
       </AvatarFallback>
     </Avatar>
   );
