@@ -1,4 +1,4 @@
-import { AppHeader, AppFooter } from "./components/common";
+import { AppHeader, AppFooter, AppSidebar } from "./components/common";
 import { Outlet } from "react-router";
 
 /**
@@ -7,12 +7,19 @@ import { Outlet } from "react-router";
  */
 function App() {
   return (
-    <div className="page">
+    <div className="flex flex-col h-screen bg-background">
       <AppHeader />
-      <div className="container">
-        <Outlet />
+      <div className="flex flex-1 overflow-hidden">
+        <AppSidebar />
+        <main className="flex-1 overflow-y-auto">
+          <div className="page">
+            <div className="container">
+              <Outlet />
+            </div>
+            <AppFooter />
+          </div>
+        </main>
       </div>
-      <AppFooter />
     </div>
   );
 }

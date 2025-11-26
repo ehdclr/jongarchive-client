@@ -22,6 +22,11 @@ export const ROUTES = {
     title: '회원가입',
     requireAuth: false,
   },
+  AUTH_CALLBACK: {
+    path: '/auth/callback',
+    title: 'OAuth 콜백',
+    requireAuth: false,
+  },
 
   // Protected Routes
   HOME: {

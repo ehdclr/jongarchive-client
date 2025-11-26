@@ -22,6 +22,10 @@ export const API_ROUTES = {
       url: '/auth/logout',
       method: 'POST',
     },
+    SET_COOKIES: {
+      url: '/auth/set-cookies',
+      method: 'POST',
+    },
   },
   USERS: {
     SIGNUP: {

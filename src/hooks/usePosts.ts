@@ -32,7 +32,7 @@ export const postKeys = {
 
 export function usePostsInfinite(limit = 10) {
   return useInfiniteQuery({
-    queryKey: postKeys.lists(),
+    queryKey: [...postKeys.lists(), { limit }],
     queryFn: ({ pageParam = 1 }) => fetchPosts({ page: pageParam, limit }),
     getNextPageParam: (lastPage) =>
       lastPage.meta.hasMore ? lastPage.meta.page + 1 : undefined,

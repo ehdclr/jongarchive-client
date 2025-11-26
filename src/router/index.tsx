@@ -8,6 +8,7 @@ import App from "@/App";
 const Home = lazy(() => import("@/pages/Home"));
 const Signin = lazy(() => import("@/pages/Signin"));
 const SignUp = lazy(() => import("@/pages/SignUp"));
+const AuthCallback = lazy(() => import("@/pages/Auth/Callback"));
 const Posts = lazy(() => import("@/pages/Posts"));
 const PostNew = lazy(() => import("@/pages/Posts/new"));
 const PostDetail = lazy(() => import("@/pages/Posts/[post_id]"));
@@ -49,6 +50,9 @@ export const AppRouter = () => {
   return (
     <Suspense fallback={<LoadingFallback />}>
       <Routes>
+        {/* Auth Callback (인증 상태 무관) */}
+        <Route path={ROUTES.AUTH_CALLBACK.path} element={<AuthCallback />} />
+
         {/* Public Routes (레이아웃 없음) */}
         {publicRoutes.map(({ path, element: Element }) => (
           <Route

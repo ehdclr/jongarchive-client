@@ -22,8 +22,10 @@ export default defineConfig({
     host: true, // 0.0.0.0으로 바인딩하여 외부 접속 허용
     proxy: {
       "/api": {
-        target: "http://localhost:8000", //나중에 url수정
+        target: "http://localhost:8000",
         changeOrigin: true,
+        cookieDomainRewrite: "",
+        secure: false,
       },
     },
   },
