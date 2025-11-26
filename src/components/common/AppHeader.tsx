@@ -29,6 +29,10 @@ function AppHeader() {
             <NavLink className="font-semibold" to="/portfolio">
               Portfolio
             </NavLink>
+            <Separator orientation="vertical" className="h-4!" />
+            <NavLink className="font-semibold" to="/chat">
+              Chat
+            </NavLink>
           </div>
         </div>
         {/* 오른쪽 버튼 영역 */}

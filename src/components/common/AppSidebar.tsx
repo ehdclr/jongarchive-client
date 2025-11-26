@@ -2,7 +2,7 @@ import { Button } from "../ui/button";
 import { ScrollArea } from "../ui/scroll-area";
 import { Skeleton } from "../ui/skeleton";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui/collapsible";
-import { Copy, Check, LayoutGridIcon, HomeIcon, UserIcon, ChevronDownIcon } from "lucide-react";
+import { Copy, Check, LayoutGridIcon, HomeIcon, UserIcon, ChevronDownIcon, MessageCircleIcon } from "lucide-react";
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { useCategories } from "@/hooks/useCategories";
@@ -45,8 +45,8 @@ function AppSidebar() {
   // 현재 경로에 따른 active 상태
   const isPostsPage = location.pathname.startsWith("/posts");
   const isProfilePage = location.pathname.startsWith("/profile");
+  const isChatPage = location.pathname.startsWith("/chat");
   const isHomePage = location.pathname === "/";
-
   return (
     <aside className="w-64 shrink-0 bg-card border-r border-border flex flex-col">
       {/* 헤더 영역 */}
@@ -76,6 +76,15 @@ function AppSidebar() {
             >
               <LayoutGridIcon className="h-4 w-4" />
               게시물
+            </button>
+            <button
+              onClick={() => navigate("/chat")}
+              className={`w-full text-left px-4 py-2 rounded-lg text-sm transition-all flex items-center gap-2 ${
+                isChatPage ? "bg-primary text-primary-foreground font-semibold" : "text-foreground hover:bg-muted"
+              }`}
+            >
+              <MessageCircleIcon className="h-4 w-4" />
+              채팅
             </button>
             <button
               onClick={() => navigate("/profile")}

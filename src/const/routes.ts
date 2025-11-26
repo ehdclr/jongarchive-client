@@ -64,6 +64,11 @@ export const ROUTES = {
     title: '설정',
     requireAuth: true,
   },
+  CHAT: {
+    path: '/chat',
+    title: '채팅',
+    requireAuth: true,
+  },
 } as const;
 
 /**
