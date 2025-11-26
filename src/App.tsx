@@ -1,4 +1,4 @@
-import { AppHeader, AppFooter, AppSidebar } from "./components/common";
+import { AppHeader, AppFooter, AppSidebar, withMaintenance } from "./components/common";
 import { Outlet } from "react-router";
 
 /**
@@ -24,4 +24,6 @@ function App() {
   );
 }
 
-export default App;
+export default withMaintenance(App, {
+  enabled: import.meta.env.VITE_MAINTENANCE_MODE === "true",
+});
