@@ -77,6 +77,21 @@ export async function fetchPostsByCategory(
   return response.data;
 }
 
+export async function fetchMyPrivatePosts(
+  params: PaginationParams = {}
+): Promise<PaginatedResponse<PostWithAuthor>> {
+  const searchParams = new URLSearchParams();
+  if (params.page) searchParams.set("page", String(params.page));
+  if (params.limit) searchParams.set("limit", String(params.limit));
+
+  const url = searchParams.toString()
+    ? `${API_ROUTES.POSTS.MY_PRIVATE.url}?${searchParams}`
+    : API_ROUTES.POSTS.MY_PRIVATE.url;
+
+  const response = await apiClient.get(url);
+  return response.data;
+}
+
 export async function createPost(
   data: CreatePostRequest
 ): Promise<SingleResponse<Post>> {

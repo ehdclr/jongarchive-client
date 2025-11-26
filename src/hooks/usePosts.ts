@@ -9,6 +9,7 @@ import {
   fetchPost,
   fetchMyPosts,
   fetchPostsByCategory,
+  fetchMyPrivatePosts,
   createPost,
   updatePost,
   deletePost,
@@ -85,6 +86,17 @@ export function usePostsByCategoryInfinite(
       lastPage.meta.hasMore ? lastPage.meta.page + 1 : undefined,
     initialPageParam: 1,
     enabled: !!categoryId,
+  });
+}
+
+export function useMyPrivatePostsInfinite(limit = 10) {
+  return useInfiniteQuery({
+    queryKey: [...postKeys.myPosts(), "private"],
+    queryFn: ({ pageParam = 1 }) =>
+      fetchMyPrivatePosts({ page: pageParam, limit }),
+    getNextPageParam: (lastPage) =>
+      lastPage.meta.hasMore ? lastPage.meta.page + 1 : undefined,
+    initialPageParam: 1,
   });
 }
 

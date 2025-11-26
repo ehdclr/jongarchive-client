@@ -70,6 +70,10 @@ export const API_ROUTES = {
       url: '/posts/me/posts',
       method: 'GET',
     },
+    MY_PRIVATE: {
+      url: '/posts/me/private',
+      method: 'GET',
+    },
     BY_AUTHOR: (authorId: number) => ({
       url: `/posts/author/${authorId}`,
       method: 'GET',

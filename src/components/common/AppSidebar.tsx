@@ -2,9 +2,9 @@ import { Button } from "../ui/button";
 import { ScrollArea } from "../ui/scroll-area";
 import { Skeleton } from "../ui/skeleton";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui/collapsible";
-import { Copy, Check, LayoutGridIcon, HomeIcon, UserIcon, ChevronDownIcon, MessageCircleIcon } from "lucide-react";
-import { useState } from "react";
-import { useLocation, useNavigate } from "react-router";
+import { Copy, Check, LayoutGridIcon, HomeIcon, UserIcon, ChevronDownIcon, MessageCircleIcon, LockIcon } from "lucide-react";
+import { useState, useMemo } from "react";
+import { useLocation, useNavigate, useSearchParams } from "react-router";
 import { useCategories } from "@/hooks/useCategories";
 import useAuthStore from "@/store/useAuthStore";
 import { UserAvatar } from "./UserAvatar";
@@ -12,12 +12,20 @@ import { UserAvatar } from "./UserAvatar";
 function AppSidebar() {
   const location = useLocation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { user } = useAuthStore();
   const { data: categoriesData, isLoading } = useCategories();
   const categories = categoriesData?.payload ?? [];
-  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
   const [copied, setCopied] = useState(false);
   const [isCategoryOpen, setIsCategoryOpen] = useState(true);
+
+  // URL에서 카테고리와 필터 읽기
+  const selectedCategoryId = useMemo(() => {
+    const param = searchParams.get("category");
+    return param ? Number(param) : null;
+  }, [searchParams]);
+
+  const showPrivateOnly = searchParams.get("filter") === "private";
 
   const handleCopyUserCode = async () => {
     if (!user?.userCode) return;
@@ -95,45 +103,73 @@ function AppSidebar() {
             </button>
           </div>
 
-          {/* 카테고리 (접었다 펼 수 있음) - Posts 페이지에서만 표시 */}
+          {/* 필터 - Posts 페이지에서만 표시 */}
           {isPostsPage && (
-            <Collapsible open={isCategoryOpen} onOpenChange={setIsCategoryOpen}>
-              <CollapsibleTrigger className="w-full flex items-center justify-between px-2 py-1 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors">
-                카테고리
-                <ChevronDownIcon className={`h-4 w-4 transition-transform ${isCategoryOpen ? "" : "-rotate-90"}`} />
-              </CollapsibleTrigger>
-              <CollapsibleContent className="space-y-1 mt-2">
+            <>
+              {/* 내 비공개글 필터 */}
+              <div className="space-y-1">
+                <p className="text-xs font-semibold text-muted-foreground px-2 mb-2">필터</p>
                 <button
-                  onClick={() => setSelectedCategoryId(null)}
+                  onClick={() => navigate("/posts")}
                   className={`w-full text-left px-4 py-2 rounded-lg text-sm transition-all flex items-center gap-2 ${
-                    selectedCategoryId === null ? "bg-muted font-semibold" : "text-foreground hover:bg-muted"
+                    !showPrivateOnly && selectedCategoryId === null ? "bg-muted font-semibold" : "text-foreground hover:bg-muted"
                   }`}
                 >
                   <LayoutGridIcon className="h-4 w-4" />
-                  전체
+                  전체 공개글
                 </button>
-                {isLoading ? (
-                  <>
-                    <Skeleton className="h-9 w-full" />
-                    <Skeleton className="h-9 w-full" />
-                    <Skeleton className="h-9 w-full" />
-                  </>
-                ) : (
-                  categories.map((category) => (
+                <button
+                  onClick={() => navigate("/posts?filter=private")}
+                  className={`w-full text-left px-4 py-2 rounded-lg text-sm transition-all flex items-center gap-2 ${
+                    showPrivateOnly ? "bg-muted font-semibold" : "text-foreground hover:bg-muted"
+                  }`}
+                >
+                  <LockIcon className="h-4 w-4" />
+                  내 비공개글
+                </button>
+              </div>
+
+              {/* 카테고리 (접었다 펼 수 있음) */}
+              {!showPrivateOnly && (
+                <Collapsible open={isCategoryOpen} onOpenChange={setIsCategoryOpen}>
+                  <CollapsibleTrigger className="w-full flex items-center justify-between px-2 py-1 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors">
+                    카테고리
+                    <ChevronDownIcon className={`h-4 w-4 transition-transform ${isCategoryOpen ? "" : "-rotate-90"}`} />
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="space-y-1 mt-2">
                     <button
-                      key={category.id}
-                      onClick={() => setSelectedCategoryId(category.id)}
+                      onClick={() => navigate("/posts")}
                       className={`w-full text-left px-4 py-2 rounded-lg text-sm transition-all flex items-center gap-2 ${
-                        selectedCategoryId === category.id ? "bg-muted font-semibold" : "text-foreground hover:bg-muted"
+                        selectedCategoryId === null ? "bg-muted font-semibold" : "text-foreground hover:bg-muted"
                       }`}
                     >
-                      <span className="h-3 w-3 rounded-full" style={{ backgroundColor: category.color }} />
-                      {category.name}
+                      <LayoutGridIcon className="h-4 w-4" />
+                      전체
                     </button>
-                  ))
-                )}
-              </CollapsibleContent>
-            </Collapsible>
+                    {isLoading ? (
+                      <>
+                        <Skeleton className="h-9 w-full" />
+                        <Skeleton className="h-9 w-full" />
+                        <Skeleton className="h-9 w-full" />
+                      </>
+                    ) : (
+                      categories.map((category) => (
+                        <button
+                          key={category.id}
+                          onClick={() => navigate(`/posts?category=${category.id}`)}
+                          className={`w-full text-left px-4 py-2 rounded-lg text-sm transition-all flex items-center gap-2 ${
+                            selectedCategoryId === category.id ? "bg-muted font-semibold" : "text-foreground hover:bg-muted"
+                          }`}
+                        >
+                          <span className="h-3 w-3 rounded-full" style={{ backgroundColor: category.color }} />
+                          {category.name}
+                        </button>
+                      ))
+                    )}
+                  </CollapsibleContent>
+                </Collapsible>
+              )}
+            </>
           )}
         </div>
       </ScrollArea>
