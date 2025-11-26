@@ -7,7 +7,7 @@ import { useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { useCategories } from "@/hooks/useCategories";
 import useAuthStore from "@/store/useAuthStore";
-import { getAnimalEmoji } from "./UserAvatar";
+import { UserAvatar } from "./UserAvatar";
 
 function AppSidebar() {
   const location = useLocation();
@@ -18,8 +18,6 @@ function AppSidebar() {
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
   const [copied, setCopied] = useState(false);
   const [isCategoryOpen, setIsCategoryOpen] = useState(true);
-
-  const userAvatar = getAnimalEmoji(user?.id, user?.userCode, user?.role);
 
   const handleCopyUserCode = async () => {
     if (!user?.userCode) return;
@@ -144,7 +142,7 @@ function AppSidebar() {
       {user && (
         <div className="p-6 border-t border-border">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-xl">{userAvatar}</div>
+            <UserAvatar src={user.profileImageUrl} name={user.name} userId={user.id} userCode={user.userCode} role={user.role} className="w-10 h-10 text-xl" />
             <div className="flex-1">
               <p className="font-semibold text-foreground text-sm">{user.name}</p>
               {user.userCode && (

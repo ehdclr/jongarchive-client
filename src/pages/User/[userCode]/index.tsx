@@ -70,7 +70,7 @@ export default function UserProfilePage() {
   const handleUnfollow = async () => {
     if (!userData) return;
     try {
-      await unfollowMutation.mutateAsync(userData.id);
+      await unfollowMutation.mutateAsync({ userId: userData.id, userCode: userData.userCode });
       toast.success("언팔로우했습니다.");
     } catch {
       toast.error("언팔로우에 실패했습니다.");

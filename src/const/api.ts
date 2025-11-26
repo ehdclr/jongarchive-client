@@ -52,6 +52,10 @@ export const API_ROUTES = {
       url: '/users/me',
       method: 'DELETE',
     },
+    SEARCH: (query: string) => ({
+      url: `/users/search?q=${encodeURIComponent(query)}`,
+      method: 'GET',
+    }),
   },
   POSTS: {
     LIST: {

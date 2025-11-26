@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useNavigate, Link } from "react-router";
-import { Copy, Check, Users, Edit2, FileText, Award, Settings, Trash2, Lock } from "lucide-react";
+import { Copy, Check, Users, Edit2, FileText, Award, Settings, Trash2, Lock, Camera, X, Eye, EyeOff } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import useAuthStore from "@/store/useAuthStore";
 import { toast } from "sonner";
-import { useFollowing, useFollowers, useFollowCounts } from "@/hooks/useFollows";
+import { useFollowing, useFollowers, useFollowCounts, useFollow, useUnfollow } from "@/hooks/useFollows";
 import { UserAvatar } from "@/components/common/UserAvatar";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import apiClient from "@/lib/axios";
@@ -18,7 +18,7 @@ type TabType = "profile" | "following" | "followers";
 
 export default function ProfilePage() {
   const navigate = useNavigate();
-  const { user, logout } = useAuthStore();
+  const { user, logout, setUser } = useAuthStore();
   const [activeTab, setActiveTab] = useState<TabType>("profile");
   const [copiedCode, setCopiedCode] = useState(false);
 
@@ -33,19 +33,37 @@ export default function ProfilePage() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [phoneNumber, setPhoneNumber] = useState(user?.phoneNumber ?? "");
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Delete account dialog
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
 
+  // 프로필 이미지 수정
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [removeImage, setRemoveImage] = useState(false);
+
   const { data: followingData } = useFollowing();
   const { data: followersData } = useFollowers();
   const { data: countsData } = useFollowCounts();
+  const { mutate: followMutate } = useFollow();
+  const { mutate: unfollowMutate } = useUnfollow();
 
   const following = followingData?.payload ?? [];
   const followers = followersData?.payload ?? [];
   const followingCount = countsData?.payload?.followingCount ?? 0;
   const followersCount = countsData?.payload?.followersCount ?? 0;
+
+  // 팔로잉 목록의 userId Set (맞팔 확인용)
+  const followingIds = new Set(following.map((f) => f.id));
+
+  // 사용자 코드로 팔로우
+  const [followUserCode, setFollowUserCode] = useState("");
 
   const handleCopyUserCode = async () => {
     if (!user?.userCode) return;
@@ -59,22 +77,36 @@ export default function ProfilePage() {
     }
   };
 
-  // 프로필 수정 저장 (이름 + 소개)
+  // 프로필 수정 저장 (이름 + 소개 + 이미지)
   const handleSaveProfile = async () => {
     if (!profileName.trim()) {
       toast.error("이름을 입력해주세요.");
       return;
     }
+    setIsUploadingImage(true);
     try {
-      await apiClient.put(API_ROUTES.USERS.UPDATE_ME.url, {
-        name: profileName,
-        bio: profileBio,
+      const formData = new FormData();
+      formData.append("name", profileName);
+      formData.append("bio", profileBio);
+      if (selectedFile) {
+        formData.append("profileImage", selectedFile);
+      } else if (removeImage) {
+        formData.append("profileImageUrl", "");
+      }
+      const response = await apiClient.put(API_ROUTES.USERS.UPDATE_ME.url, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       });
+
+      if (response.data?.payload) {
+        setUser(response.data.payload);
+      }
       toast.success("프로필이 수정되었습니다.");
-      setIsEditingProfile(false);
       window.location.reload();
     } catch {
       toast.error("프로필 수정에 실패했습니다.");
+      setIsUploadingImage(false);
     }
   };
 
@@ -140,10 +172,56 @@ export default function ProfilePage() {
     }
   };
 
+  // 프로필 이미지 선택 (미리보기만)
+  const handleImageClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // 파일 크기 제한 (5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("이미지는 5MB 이하로 업로드해주세요.");
+      return;
+    }
+
+    // 이미지 파일만 허용
+    if (!file.type.startsWith("image/")) {
+      toast.error("이미지 파일만 업로드할 수 있습니다.");
+      return;
+    }
+
+    // 미리보기 생성
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreviewImage(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+    setSelectedFile(file);
+    setRemoveImage(false); // 새 이미지 선택 시 기본 이미지로 설정 취소
+  };
+
   const openProfileEdit = () => {
     setProfileName(user?.name ?? "");
     setProfileBio(user?.bio ?? "");
+    setPreviewImage(null);
+    setSelectedFile(null);
+    setRemoveImage(false);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
     setIsEditingProfile(true);
+  };
+
+  const handleRemoveImage = () => {
+    setPreviewImage(null);
+    setSelectedFile(null);
+    setRemoveImage(true);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   const openPersonalInfoEdit = () => {
@@ -308,23 +386,52 @@ export default function ProfilePage() {
         {/* Following Tab */}
         {activeTab === "following" && (
           <div className="space-y-3">
+            {/* 사용자 코드로 팔로우 */}
+            <Card className="bg-card p-4 border border-border">
+              <div className="flex items-center gap-2">
+                <Input
+                  placeholder="사용자 코드 입력"
+                  value={followUserCode}
+                  onChange={(e) => setFollowUserCode(e.target.value.toUpperCase())}
+                  className="flex-1"
+                />
+                <Button
+                  onClick={() => {
+                    if (followUserCode.trim()) {
+                      followMutate(followUserCode.trim());
+                      setFollowUserCode("");
+                    }
+                  }}
+                  disabled={!followUserCode.trim()}
+                >
+                  팔로우
+                </Button>
+              </div>
+            </Card>
             {following.length === 0 ? (
               <Card className="bg-card p-8 border border-border text-center">
                 <p className="text-muted-foreground">아직 팔로우하는 사용자가 없습니다.</p>
               </Card>
             ) : (
               following.map((followUser) => (
-                <Link key={followUser.id} to={`/user/${followUser.userCode}`}>
-                  <Card className="bg-card p-4 border border-border hover:border-primary/30 transition-colors">
-                    <div className="flex items-center gap-4">
+                <Card key={followUser.id} className="bg-card p-4 border border-border hover:border-primary/30 transition-colors">
+                  <div className="flex items-center gap-4">
+                    <Link to={`/user/${followUser.userCode}`} className="flex items-center gap-4 flex-1 min-w-0">
                       <UserAvatar src={followUser.profileImageUrl} name={followUser.name} userId={followUser.id} userCode={followUser.userCode} className="w-10 h-10" />
                       <div className="flex-1 min-w-0">
                         <p className="font-semibold text-foreground truncate">{followUser.name}</p>
                         <p className="text-xs text-muted-foreground">{followUser.userCode}</p>
                       </div>
-                    </div>
-                  </Card>
-                </Link>
+                    </Link>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => unfollowMutate({ userId: followUser.id, userCode: followUser.userCode })}
+                    >
+                      언팔로우
+                    </Button>
+                  </div>
+                </Card>
               ))
             )}
           </div>
@@ -338,32 +445,86 @@ export default function ProfilePage() {
                 <p className="text-muted-foreground">아직 팔로워가 없습니다.</p>
               </Card>
             ) : (
-              followers.map((follower) => (
-                <Link key={follower.id} to={`/user/${follower.userCode}`}>
-                  <Card className="bg-card p-4 border border-border hover:border-primary/30 transition-colors">
+              followers.map((follower) => {
+                const isFollowingBack = followingIds.has(follower.id);
+                return (
+                  <Card key={follower.id} className="bg-card p-4 border border-border hover:border-primary/30 transition-colors">
                     <div className="flex items-center gap-4">
-                      <UserAvatar src={follower.profileImageUrl} name={follower.name} userId={follower.id} userCode={follower.userCode} className="w-10 h-10" />
-                      <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-foreground truncate">{follower.name}</p>
-                        <p className="text-xs text-muted-foreground">{follower.userCode}</p>
-                      </div>
+                      <Link to={`/user/${follower.userCode}`} className="flex items-center gap-4 flex-1 min-w-0">
+                        <UserAvatar src={follower.profileImageUrl} name={follower.name} userId={follower.id} userCode={follower.userCode} className="w-10 h-10" />
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-foreground truncate">{follower.name}</p>
+                          <p className="text-xs text-muted-foreground">{follower.userCode}</p>
+                        </div>
+                      </Link>
+                      {isFollowingBack ? (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => unfollowMutate({ userId: follower.id, userCode: follower.userCode })}
+                        >
+                          언팔로우
+                        </Button>
+                      ) : (
+                        <Button
+                          size="sm"
+                          onClick={() => followMutate(follower.userCode)}
+                        >
+                          팔로우
+                        </Button>
+                      )}
                     </div>
                   </Card>
-                </Link>
-              ))
+                );
+              })
             )}
           </div>
         )}
       </div>
 
-      {/* Edit Profile Dialog (이름 + 소개) */}
+      {/* Edit Profile Dialog (이미지 + 이름 + 소개) */}
       <Dialog open={isEditingProfile} onOpenChange={setIsEditingProfile}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>프로필 수정</DialogTitle>
-            <DialogDescription>이름과 소개를 수정할 수 있습니다.</DialogDescription>
+            <DialogDescription>프로필 이미지, 이름, 소개를 수정할 수 있습니다.</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 mt-2">
+            {/* 프로필 이미지 수정 */}
+            <div className="flex flex-col items-center gap-3">
+              <div className="relative group">
+                {previewImage ? (
+                  <>
+                    <img src={previewImage} alt="미리보기" className="w-20 h-20 rounded-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={handleRemoveImage}
+                      className="absolute -top-1 -right-1 w-6 h-6 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </>
+                ) : removeImage || !user?.profileImageUrl ? (
+                  <UserAvatar src={null} name={user?.name ?? ""} userId={user?.id ?? 0} userCode={user?.userCode} className="w-20 h-20 text-4xl" />
+                ) : (
+                  <>
+                    <img src={user.profileImageUrl} alt={user?.name ?? ""} className="w-20 h-20 rounded-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={handleRemoveImage}
+                      className="absolute -top-1 -right-1 w-6 h-6 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </>
+                )}
+              </div>
+              <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
+              <Button type="button" variant="outline" size="sm" onClick={handleImageClick}>
+                <Camera className="w-4 h-4 mr-1" />
+                이미지 {(!!user?.profileImageUrl && !removeImage) || previewImage ? "변경" : "추가"}
+              </Button>
+            </div>
             <div>
               <Label htmlFor="profileName">이름</Label>
               <Input id="profileName" value={profileName} onChange={(e) => setProfileName(e.target.value)} placeholder="이름" className="mt-1" />
@@ -374,10 +535,12 @@ export default function ProfilePage() {
             </div>
           </div>
           <DialogFooter className="mt-4">
-            <Button variant="outline" onClick={() => setIsEditingProfile(false)}>
+            <Button type="button" variant="outline" onClick={() => setIsEditingProfile(false)}>
               취소
             </Button>
-            <Button onClick={handleSaveProfile}>저장</Button>
+            <Button type="button" onClick={handleSaveProfile} disabled={isUploadingImage}>
+              {isUploadingImage ? "저장 중..." : "저장"}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -394,23 +557,73 @@ export default function ProfilePage() {
               <Label htmlFor="phoneNumber">전화번호</Label>
               <Input id="phoneNumber" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} placeholder="010-0000-0000" className="mt-1" />
             </div>
-            <div className="border-t pt-4">
-              <p className="text-sm font-medium mb-2">비밀번호 변경</p>
-              <div className="space-y-3">
-                <div>
-                  <Label htmlFor="currentPassword">현재 비밀번호</Label>
-                  <Input id="currentPassword" type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} placeholder="현재 비밀번호" className="mt-1" />
-                </div>
-                <div>
-                  <Label htmlFor="newPassword">새 비밀번호</Label>
-                  <Input id="newPassword" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="새 비밀번호 (6자 이상)" className="mt-1" />
-                </div>
-                <div>
-                  <Label htmlFor="confirmPassword">새 비밀번호 확인</Label>
-                  <Input id="confirmPassword" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="새 비밀번호 확인" className="mt-1" />
+            {user?.provider === "local" && (
+              <div className="border-t pt-4">
+                <p className="text-sm font-medium mb-2">비밀번호 변경</p>
+                <div className="space-y-3">
+                  <div>
+                    <Label htmlFor="currentPassword">현재 비밀번호</Label>
+                    <div className="relative mt-1">
+                      <Input
+                        id="currentPassword"
+                        type={showCurrentPassword ? "text" : "password"}
+                        value={currentPassword}
+                        onChange={(e) => setCurrentPassword(e.target.value)}
+                        placeholder="현재 비밀번호"
+                        className="pr-10"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                      >
+                        {showCurrentPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+                  <div>
+                    <Label htmlFor="newPassword">새 비밀번호</Label>
+                    <div className="relative mt-1">
+                      <Input
+                        id="newPassword"
+                        type={showNewPassword ? "text" : "password"}
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        placeholder="새 비밀번호 (6자 이상)"
+                        className="pr-10"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowNewPassword(!showNewPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                      >
+                        {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+                  <div>
+                    <Label htmlFor="confirmPassword">새 비밀번호 확인</Label>
+                    <div className="relative mt-1">
+                      <Input
+                        id="confirmPassword"
+                        type={showConfirmPassword ? "text" : "password"}
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        placeholder="새 비밀번호 확인"
+                        className="pr-10"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                      >
+                        {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
           <DialogFooter className="mt-4">
             <Button variant="outline" onClick={() => setIsEditingPersonalInfo(false)}>

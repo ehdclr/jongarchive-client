@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { formatDistanceToNow } from "date-fns";
 import { ko } from "date-fns/locale";
 import {
@@ -63,6 +63,7 @@ interface PostCardProps {
 
 export function PostCard({ data, showPublishBadge = false }: PostCardProps) {
   const { post, author } = data;
+  const navigate = useNavigate();
 
   const contentPreview = useMemo(() => {
     return extractTextFromBlockNote(post.content);
@@ -96,10 +97,13 @@ export function PostCard({ data, showPublishBadge = false }: PostCardProps) {
           </p>
         </CardContent>
         <CardFooter className="flex items-center justify-between">
-          <Link
-            to={`/user/${author.userCode}`}
-            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
-            onClick={(e) => e.stopPropagation()}
+          <div
+            className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              navigate(`/user/${author.userCode}`);
+            }}
           >
             <UserAvatar
               src={author.profileImageUrl}
@@ -110,7 +114,7 @@ export function PostCard({ data, showPublishBadge = false }: PostCardProps) {
               fallbackClassName="text-sm"
             />
             <span className="text-sm text-muted-foreground hover:text-primary transition-colors">{author.name}</span>
-          </Link>
+          </div>
           <span className="text-xs text-muted-foreground">
             {formatDistanceToNow(new Date(post.createdAt), {
               addSuffix: true,

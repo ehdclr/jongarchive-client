@@ -40,10 +40,12 @@ function getAnimalEmoji(userId?: number, userCode?: string, role?: UserRole): st
 
 function UserAvatar({ src, name, userId, userCode, role, className, fallbackClassName }: UserAvatarProps) {
   const emoji = getAnimalEmoji(userId, userCode, role);
+  // 빈 문자열도 falsy로 처리하여 이미지가 없으면 동물 이모지 표시
+  const hasImage = !!src && src.length > 0;
 
   return (
     <Avatar className={cn("h-9 w-9", className)}>
-      {src && <AvatarImage src={src} alt={name ?? "User"} />}
+      {hasImage && <AvatarImage src={src} alt={name ?? "User"} />}
       <AvatarFallback className={cn("text-lg", fallbackClassName)}>
         {emoji}
       </AvatarFallback>
