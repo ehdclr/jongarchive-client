@@ -125,4 +125,10 @@ export const API_ROUTES = {
       method: 'GET',
     }),
   },
+  UPLOADS: {
+    IMAGE: {
+      url: '/uploads/image',
+      method: 'POST',
+    },
+  },
 }

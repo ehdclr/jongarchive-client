@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { NavLink, useNavigate } from "react-router";
 import { AvatarUpload } from "@/components/common";
+import { Eye, EyeOff } from "lucide-react";
 import { getErrorMessage } from "@/const/error";
 import { toast } from "sonner";
 import apiClient from "@/lib/axios";
@@ -46,6 +47,8 @@ export default function SignUp() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleFileChange = (file: File | null) => {
     if (file) {
@@ -176,7 +179,18 @@ export default function SignUp() {
                       Password <span className="text-xs text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
-                      <Input type="password" placeholder="비밀번호를 입력해주세요" {...field} />
+                      <div className="relative">
+                        <Input type={showPassword ? "text" : "password"} placeholder="비밀번호를 입력해주세요" {...field} />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                          onClick={() => setShowPassword(!showPassword)}
+                        >
+                          {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </Button>
+                      </div>
                     </FormControl>
                     <FormMessage className="text-sm" />
                   </FormItem>
@@ -191,7 +205,18 @@ export default function SignUp() {
                       Confirm Password <span className="text-xs text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
-                      <Input type="password" placeholder="비밀번호 확인을 입력해주세요" {...field} />
+                      <div className="relative">
+                        <Input type={showConfirmPassword ? "text" : "password"} placeholder="비밀번호 확인을 입력해주세요" {...field} />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        >
+                          {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </Button>
+                      </div>
                     </FormControl>
                     <FormMessage className="text-sm" />
                   </FormItem>
@@ -243,7 +268,7 @@ export default function SignUp() {
                 )}
               />
               <div className="w-full flex flex-col gap-3">
-                <Button type="submit" className="flex-1 !bg-blue-800/50" variant="outline">
+                <Button type="submit" className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90">
                   회원가입
                 </Button>
                 <div className="text-center text-muted-foreground">

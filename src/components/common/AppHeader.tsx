@@ -82,7 +82,7 @@ function AppHeader() {
   };
 
   return (
-    <header className="shrink-0 z-20 w-full flex items-center justify-center bg-[#121212] border-b border-border">
+    <header className="shrink-0 z-20 w-full flex items-center justify-center bg-card border-b border-border">
       <div className="w-full max-w-[1440px] flex items-center justify-between px-4 py-2">
         {/* 로고 & 네비게이션 영역  */}
         <div className="flex items-center gap-5">

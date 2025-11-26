@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { NavLink } from "react-router";
+import { Eye, EyeOff } from "lucide-react";
 import { useNavigate } from "react-router";
 import { getErrorMessage } from "@/const/error";
 import { toast } from "sonner";
@@ -21,6 +22,7 @@ const formSchema = z.object({
 export default function Signin() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const { setUser } = useAuthStore();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -80,7 +82,7 @@ export default function Signin() {
               <span className="w-full border-t"></span>
             </div>
             <div className="relative flex justify-center text-xs">
-              <span className="px-2 text-muted-foreground bg-black uppercase">OR CONTINUE WITH</span>
+              <span className="px-2 text-muted-foreground bg-background uppercase">OR CONTINUE WITH</span>
             </div>
           </div>
           {/* 로그인 폼 */}
@@ -106,14 +108,25 @@ export default function Signin() {
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input type="password" placeholder="비밀번호를 입력해주세요" {...field} />
+                      <div className="relative">
+                        <Input type={showPassword ? "text" : "password"} placeholder="비밀번호를 입력해주세요" {...field} />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                          onClick={() => setShowPassword(!showPassword)}
+                        >
+                          {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </Button>
+                      </div>
                     </FormControl>
                     <FormMessage className="text-sm" />
                   </FormItem>
                 )}
               />
               <div className="w-full flex flex-col gap-3">
-                <Button type="submit" className="flex-1 !bg-blue-800/50" variant="outline">
+                <Button type="submit" className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90">
                   로그인
                 </Button>
                 <div className="text-center text-muted-foreground">

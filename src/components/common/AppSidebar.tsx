@@ -161,7 +161,7 @@ function AppSidebar() {
       {/* Footer - Posts 페이지에서만 표시 */}
       {isPostsPage && (
         <div className="p-4 border-t border-border">
-          <Button onClick={() => navigate("/posts/new")} className="w-full bg-[#5cff72] text-[#0b0b0d] hover:bg-[#5cff72]/90" size="sm">
+          <Button onClick={() => navigate("/posts/new")} className="w-full bg-[var(--brand-lime)] text-primary-foreground hover:bg-[var(--brand-lime)]/90" size="sm">
             ✏️ 새로운 토픽
           </Button>
         </div>
