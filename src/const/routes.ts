@@ -27,7 +27,6 @@ export const ROUTES = {
     title: 'OAuth 콜백',
     requireAuth: false,
   },
-
   // Protected Routes
   HOME: {
     path: '/',
@@ -57,6 +56,11 @@ export const ROUTES = {
   PROFILE: {
     path: '/profile',
     title: '프로필',
+    requireAuth: true,
+  },
+  USER_PROFILE: {
+    path: '/user/:userCode',
+    title: '사용자 프로필',
     requireAuth: true,
   },
   SETTINGS: {
@@ -89,6 +93,7 @@ export const PROTECTED_PATHS = [
   ROUTES.POST_DETAIL.path,
   ROUTES.POST_EDIT.path,
   ROUTES.PROFILE.path,
+  ROUTES.USER_PROFILE.path,
   ROUTES.SETTINGS.path,
 ];
 

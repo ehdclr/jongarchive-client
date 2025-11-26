@@ -96,7 +96,11 @@ export function PostCard({ data, showPublishBadge = false }: PostCardProps) {
           </p>
         </CardContent>
         <CardFooter className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
+          <Link
+            to={`/user/${author.userCode}`}
+            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+            onClick={(e) => e.stopPropagation()}
+          >
             <UserAvatar
               src={author.profileImageUrl}
               name={author.name}
@@ -105,8 +109,8 @@ export function PostCard({ data, showPublishBadge = false }: PostCardProps) {
               className="h-6 w-6"
               fallbackClassName="text-sm"
             />
-            <span className="text-sm text-muted-foreground">{author.name}</span>
-          </div>
+            <span className="text-sm text-muted-foreground hover:text-primary transition-colors">{author.name}</span>
+          </Link>
           <span className="text-xs text-muted-foreground">
             {formatDistanceToNow(new Date(post.createdAt), {
               addSuffix: true,

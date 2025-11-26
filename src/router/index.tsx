@@ -14,6 +14,7 @@ const PostNew = lazy(() => import("@/pages/Posts/new"));
 const PostDetail = lazy(() => import("@/pages/Posts/[post_id]"));
 const PostEdit = lazy(() => import("@/pages/Posts/[post_id]/edit"));
 const Profile = lazy(() => import("@/pages/Profile"));
+const UserProfile = lazy(() => import("@/pages/User/[userCode]"));
 const Chat = lazy(() => import("@/pages/Chat"));
 
 // Route 설정 타입
@@ -36,6 +37,7 @@ const protectedRoutes: RouteItem[] = [
   { path: ROUTES.POST_DETAIL.path, element: PostDetail },
   { path: ROUTES.POST_EDIT.path, element: PostEdit },
   { path: ROUTES.PROFILE.path, element: Profile },
+  { path: ROUTES.USER_PROFILE.path, element: UserProfile },
   { path: ROUTES.CHAT.path, element: Chat },
 ];
 

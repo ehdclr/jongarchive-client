@@ -1,8 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
-import apiClient from "@/lib/axios";
-import { API_ROUTES } from "@/const/api";
+import { setAccessToken } from "@/lib/axios";
 import { ROUTES } from "@/const/routes";
 import useAuthStore from "@/store/useAuthStore";
 
@@ -14,21 +13,19 @@ const AuthCallback = () => {
     const handleCallback = async () => {
       const params = new URLSearchParams(window.location.search);
       const accessToken = params.get("accessToken");
-      const refreshToken = params.get("refreshToken");
 
       // URL에서 토큰 제거 (중복 실행 방지)
       window.history.replaceState({}, "", window.location.pathname);
 
-      // 토큰이 없으면 이미 처리됐거나 잘못된 접근
-      if (!accessToken || !refreshToken) {
+      // accessToken이 없으면 이미 처리됐거나 잘못된 접근
+      if (!accessToken) {
         return;
       }
 
       try {
-        await apiClient.post(API_ROUTES.AUTH.SET_COOKIES.url, {
-          accessToken,
-          refreshToken,
-        });
+        // accessToken을 localStorage에 저장
+        // refreshToken은 서버에서 이미 쿠키로 설정됨
+        setAccessToken(accessToken);
 
         await fetchUser();
 

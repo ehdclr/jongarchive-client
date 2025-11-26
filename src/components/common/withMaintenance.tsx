@@ -1,4 +1,5 @@
 import { ComponentType } from "react";
+import useAuthStore from "@/store/useAuthStore";
 
 interface MaintenanceConfig {
   enabled?: boolean;
@@ -13,7 +14,7 @@ const defaultConfig: MaintenanceConfig = {
 };
 
 /**
- * 점검 모드 HOC
+ * 점검 모드 HOC (관리자는 우회)
  * @example
  * // 기본 사용
  * export default withMaintenance(MyPage);
@@ -34,7 +35,11 @@ function withMaintenance<P extends object>(WrappedComponent: ComponentType<P>, c
   const { enabled, title, description } = { ...defaultConfig, ...config };
 
   function MaintenanceWrapper(props: P) {
-    if (enabled) {
+    const { user } = useAuthStore();
+    const isAdmin = user?.role === "admin";
+
+    // 관리자는 점검 모드 우회
+    if (enabled && !isAdmin) {
       return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/95 backdrop-blur-sm">
           <div className="text-center space-y-4 p-8">

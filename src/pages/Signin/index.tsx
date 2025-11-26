@@ -9,7 +9,7 @@ import { NavLink } from "react-router";
 import { useNavigate } from "react-router";
 import { getErrorMessage } from "@/const/error";
 import { toast } from "sonner";
-import apiClient from "@/lib/axios";
+import apiClient, { setAccessToken } from "@/lib/axios";
 import { API_ROUTES } from "@/const/api";
 import useAuthStore from "@/store/useAuthStore";
 
@@ -37,13 +37,17 @@ export default function Signin() {
       const response = await apiClient.post(API_ROUTES.AUTH.SIGNIN.url, values);
 
       if (response.data.success) {
+        // accessToken을 localStorage에 저장
+        const { user, accessToken } = response.data.payload;
+        setAccessToken(accessToken);
+        setUser(user);
+
         toast.success("로그인 성공!", {
           description: "환영합니다!",
         });
-        navigate("/"); // 메인 페이지로 이동
-        setUser(response.data.payload);
+        navigate("/");
       }
-    } catch (error) {
+    } catch (error: any) {
       const errorType = error.response?.data?.error?.type || "unknown_error";
       const errorMessage = getErrorMessage(errorType) || "로그인에 실패했습니다.";
       toast.error("로그인 실패", {

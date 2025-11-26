@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import apiClient from "@/lib/axios";
+import apiClient, { removeAccessToken } from "@/lib/axios";
 import { API_ROUTES } from "@/const/api";
 import { ROUTES } from "@/const/routes";
 
@@ -59,9 +59,10 @@ const useAuthStore = create<AuthState>()(
           set({ isLoading: false });
         }
       },
-      logout: async() => {
+      logout: async () => {
         set({ isLoggingOut: true });
         await apiClient.post(API_ROUTES.AUTH.LOGOUT.url);
+        removeAccessToken();
         set({ user: null, isAuthenticated: false });
         window.location.href = ROUTES.SIGNIN.path;
       },

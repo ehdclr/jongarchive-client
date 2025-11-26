@@ -44,6 +44,14 @@ export const API_ROUTES = {
       url: '/users/me/profile-image',
       method: 'PUT',
     },
+    BY_USER_CODE: (userCode: string) => ({
+      url: `/users/${userCode}`,
+      method: 'GET',
+    }),
+    DELETE_ME: {
+      url: '/users/me',
+      method: 'DELETE',
+    },
   },
   POSTS: {
     LIST: {
@@ -85,6 +93,32 @@ export const API_ROUTES = {
     UNPUBLISH: (id: number) => ({
       url: `/posts/${id}/unpublish`,
       method: 'PATCH',
+    }),
+  },
+  FOLLOWS: {
+    FOLLOW: {
+      url: '/follows',
+      method: 'POST',
+    },
+    UNFOLLOW: (userId: number) => ({
+      url: `/follows/${userId}`,
+      method: 'DELETE',
+    }),
+    FOLLOWING: {
+      url: '/follows/following',
+      method: 'GET',
+    },
+    FOLLOWERS: {
+      url: '/follows/followers',
+      method: 'GET',
+    },
+    COUNTS: {
+      url: '/follows/counts',
+      method: 'GET',
+    },
+    CHECK: (userId: number) => ({
+      url: `/follows/check/${userId}`,
+      method: 'GET',
     }),
   },
 }

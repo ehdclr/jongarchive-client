@@ -92,13 +92,16 @@ export default function PostDetailPage() {
             {!post.isPublished && <Badge variant="secondary">비공개</Badge>}
           </div>
           <div className="flex items-center gap-4 text-muted-foreground">
-            <div className="flex items-center gap-2">
+            <Link
+              to={`/user/${author.userCode}`}
+              className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+            >
               <Avatar className="h-8 w-8">
                 <AvatarImage src={author.profileImageUrl ?? undefined} />
                 <AvatarFallback>{author.name.charAt(0)}</AvatarFallback>
               </Avatar>
-              <span>{author.name}</span>
-            </div>
+              <span className="hover:text-primary transition-colors">{author.name}</span>
+            </Link>
             <span>
               {formatDistanceToNow(new Date(post.createdAt), {
                 addSuffix: true,
