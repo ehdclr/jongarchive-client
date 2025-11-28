@@ -26,6 +26,18 @@ export function useChat({ roomId, onMessage, onUserJoined, onUserLeft }: UseChat
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  // 콜백을 ref로 저장하여 재연결 방지
+  const onMessageRef = useRef(onMessage);
+  const onUserJoinedRef = useRef(onUserJoined);
+  const onUserLeftRef = useRef(onUserLeft);
+
+  // 최신 콜백 유지
+  useEffect(() => {
+    onMessageRef.current = onMessage;
+    onUserJoinedRef.current = onUserJoined;
+    onUserLeftRef.current = onUserLeft;
+  });
+
   useEffect(() => {
     const token = getAccessToken();
 
@@ -35,6 +47,19 @@ export function useChat({ roomId, onMessage, onUserJoined, onUserLeft }: UseChat
       return;
     }
 
+    // 이미 연결되어 있으면 재사용
+    if (socketRef.current?.connected) {
+      console.log('Socket already connected, reusing connection');
+      return;
+    }
+
+    // 기존 소켓이 있으면 정리
+    if (socketRef.current) {
+      console.log('Cleaning up existing socket');
+      socketRef.current.disconnect();
+      socketRef.current.removeAllListeners();
+    }
+
     // WebSocket URL 구성
     // 개발 환경: localhost:8000 (backend)
     // 프로덕션: 현재 origin 사용
@@ -42,6 +67,8 @@ export function useChat({ roomId, onMessage, onUserJoined, onUserLeft }: UseChat
     const wsUrl = isDev
       ? 'http://localhost:8000'
       : window.location.origin;
+
+    console.log('Creating new socket connection...');
 
     // Socket.IO 클라이언트 생성
     const socket = io(`${wsUrl}/chat`, {
@@ -91,32 +118,34 @@ export function useChat({ roomId, onMessage, onUserJoined, onUserLeft }: UseChat
     socket.on('message', (message: ChatMessage) => {
       console.log('Message received:', message);
       setMessages((prev) => [...prev, message]);
-      onMessage?.(message);
+      onMessageRef.current?.(message);
     });
 
     // 사용자 입장
     socket.on('userJoined', (data: { userId: number; nickname: string; activeUsers: number }) => {
       console.log('User joined:', data);
       setActiveUsers(data.activeUsers);
-      onUserJoined?.(data);
+      onUserJoinedRef.current?.(data);
     });
 
     // 사용자 퇴장
     socket.on('userLeft', (data: { userId: number; nickname: string; activeUsers: number }) => {
       console.log('User left:', data);
       setActiveUsers(data.activeUsers);
-      onUserLeft?.(data);
+      onUserLeftRef.current?.(data);
     });
 
     // 클린업
     return () => {
+      console.log('Cleaning up socket connection...');
       if (socket.connected) {
         socket.emit('leaveRoom', { roomId });
       }
       socket.disconnect();
+      socket.removeAllListeners();
       socketRef.current = null;
     };
-  }, [roomId, onMessage, onUserJoined, onUserLeft]);
+  }, [roomId]);
 
   const sendMessage = useCallback((content: string) => {
     if (!socketRef.current || !isConnected) {
