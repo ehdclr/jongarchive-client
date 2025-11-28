@@ -1,9 +1,11 @@
 export interface ChatMessage {
-  id: number;
-  avatar: string;
+  id: string;
+  roomId: number;
+  userId: number;
+  userCode: string;
+  nickname: string;
   content: string;
   timestamp: string;
-  nickname: string;
   isOwn?: boolean;
 }
 

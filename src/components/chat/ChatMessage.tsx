@@ -10,7 +10,7 @@ interface ChatMessageProps {
 const animalEmojis = ["🐺", "🐷", "🐻", "🐯", "🦁"]
 
 export function ChatMessage({ message }: ChatMessageProps) {
-  const avatarEmoji = animalEmojis[Number.parseInt(message.avatar) % animalEmojis.length]
+  const avatarEmoji = animalEmojis[message.userId % animalEmojis.length]
 
   if (message.isOwn) {
     return (
